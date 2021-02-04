@@ -120,7 +120,10 @@ class _OrderListState extends State<OverView> {
                       ),
                     ),
 
-                      InkWell(
+                    link == null ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("loading".tr()),
+                    ) :  InkWell(
                         onTap: () async {
                            String url = 'https://store.eckit.co/$link';
                             if (await canLaunch(url)) {

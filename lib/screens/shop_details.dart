@@ -210,7 +210,7 @@ class _ShopDetailsState extends State<ShopDetails> {
                 padding: const EdgeInsets.symmetric(vertical: 5),
                 child: new DropdownButton<String>(
                 iconEnabledColor: mainColor,
-                hint: Text("select_county").tr(),
+                hint: Text("select_country").tr(),
                 isExpanded: true,
                 value: country,
                 items: widget.bootData.countries.map((Countries value) {

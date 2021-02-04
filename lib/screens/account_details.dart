@@ -211,7 +211,7 @@ class _AccountDetailsState extends State<AccountDetails> {
                   width: 130,
                   child: new DropdownButton<String>(
                   iconEnabledColor: mainColor,
-                  hint: Text("select_county").tr(),
+                  hint: Text("select_country_key").tr(),
                   isExpanded: true,
                   value: code,
                   items: widget.bootData.countries.map((Countries value) {

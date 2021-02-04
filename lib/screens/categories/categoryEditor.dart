@@ -168,16 +168,16 @@ class _CategoryEditorState extends State<CategoryEditor> {
                 CustomeTextField(
                   controller:  name,
                   validator: Validator.notEmpty,
-                  hintTxt: "name_hint".tr(),
-                  labelTxt: "name_label".tr(),
+                  hintTxt: "name_hint_category".tr(),
+                  labelTxt: "name_label_category".tr(),
                 ),
 
 
                 CustomeTextField(
                   controller:  description,
                   validator: Validator.notEmpty,
-                  hintTxt: "description_hint".tr(),
-                  labelTxt: "description_label".tr(),
+                  hintTxt: "description_hint_category".tr(),
+                  labelTxt: "description_label_category".tr(),
                 ),
 
               SizedBox(height: 20,),

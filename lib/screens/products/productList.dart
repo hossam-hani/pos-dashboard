@@ -208,7 +208,7 @@ class ProductPlaceholder extends StatelessWidget {
                 SizedBox(
                 width: 200,
                 child: CustomeButton(title: "add_product",
-                icon: FontAwesomeIcons.plus,handler: (){},)),
+                icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/product_editor'),)),
 
              ],),
            ) ;

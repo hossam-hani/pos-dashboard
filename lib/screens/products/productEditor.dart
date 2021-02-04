@@ -248,12 +248,14 @@ class _ProductEditorState extends State<ProductEditor> {
                 CustomeTextField(
                   controller:  cost,
                   validator: Validator.notEmpty,
+                  isNumber: true,
                   hintTxt: "cost_hint".tr(),
                   labelTxt: "cost_label".tr(),
                 ),
 
                 CustomeTextField(
                   controller:  price,
+                  isNumber: true,
                   validator: Validator.notEmpty,
                   hintTxt: "price_hint".tr(),
                   labelTxt: "price_label".tr(),
@@ -292,7 +294,7 @@ class _ProductEditorState extends State<ProductEditor> {
                 items: <String>['KG','Unit','L'].map((String unit) {
                   return new DropdownMenuItem<String>(
                     value: unit,
-                    child: new Text(unit),
+                    child: new Text(unit.tr()),
                   );
                 }).toList(),
                 hint: Text("select_unit_hint".tr()),
@@ -500,12 +502,15 @@ class CustomeTextField extends StatelessWidget {
   TextEditingController controller;
   dynamic validator;
   bool obscureTextbool;
+  bool isNumber;
 
-  CustomeTextField({this.hintTxt,this.labelTxt,this.controller,this.validator,this.obscureTextbool = false});
+  CustomeTextField({this.hintTxt,this.labelTxt,this.controller,this.validator
+  ,this.obscureTextbool = false,this.isNumber});
 
   @override
   Widget build(BuildContext context) {
     return  TextFormField(
+            keyboardType: isNumber ? TextInputType.number : TextInputType.name ,
             obscureText: obscureTextbool,
             validator: validator,
             controller: controller,
