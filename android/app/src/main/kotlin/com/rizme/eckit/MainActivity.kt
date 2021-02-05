@@ -1,4 +1,4 @@
-package com.example.eckit
+package com.rizme.eckit
 
 import io.flutter.embedding.android.FlutterActivity
 
