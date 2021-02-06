@@ -37,6 +37,7 @@ class _OrderListState extends State<OverView> {
   TextEditingController keyword = new TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String link;
+  bool isPaid;
 
   var loadingKit = Center(
         child: Column(children: [
@@ -67,6 +68,7 @@ class _OrderListState extends State<OverView> {
       Shop shop =  await ShopService.getShopDetials();
       setState(() {
         link = shop.link;
+        isPaid = shop.isPaidAccount == 1 ? true : false;
       });
   }
 
@@ -107,51 +109,58 @@ class _OrderListState extends State<OverView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-             link == null ? Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("loading".tr()),
-                    ) : Padding(
+             isPaid == null || isPaid == true ? SizedBox() : Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(children: [
-                      FaIcon(FontAwesomeIcons.solidStar,color: Colors.white,),
-                      SizedBox(width: 10,),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                        Text(
-                          'upgrade_your_account'.tr(),
+              child: InkWell(
+                onTap: () async {
+                           String url = 'https://eckit.co/upgrade';
+                            if (await canLaunch(url)) {
+                              await launch(url);
+                            } else {
+                              throw 'Could not launch $url';
+                            }
+                        },
+                  child: Container(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(children: [
+                        FaIcon(FontAwesomeIcons.solidStar,color: Colors.white,),
+                        SizedBox(width: 10,),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                          Text(
+                            'upgrade_your_account'.tr(),
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: const Color(0xffffffff),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          Text(
+                          'upgrade_your_account_des'.tr(),
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 12,
                             color: const Color(0xffffffff),
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w300,
                           ),
                           textAlign: TextAlign.center,
-                        ),
-
-                        Text(
-                        'upgrade_your_account_des'.tr(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: const Color(0xffffffff),
-                          fontWeight: FontWeight.w300,
-                        ),
-                        textAlign: TextAlign.center,
-                      )
-                      ],),
+                        )
+                        ],),
 
          
 
-                    ],),
+                      ],),
+                    ),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      color: const Color(0xff2ecc71),
+                    ),
                   ),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.0),
-                    color: const Color(0xff2ecc71),
-                  ),
-                ),
+              ),
             ),
             
                     Padding(
