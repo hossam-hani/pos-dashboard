@@ -260,8 +260,8 @@ class _ShopDetialsState extends State<ShopDetials> {
 
                 CustomeTextField(
                   controller:  descriptionLink,
-                  hintTxt: "description_hint".tr(),
-                  labelTxt: "description_label".tr(),
+                  hintTxt: "store_des_hint".tr(),
+                  labelTxt: "store_des".tr(),
                 ),
                 
               SizedBox(height: 20,),

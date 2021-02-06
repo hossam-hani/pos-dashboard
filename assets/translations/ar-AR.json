@@ -112,6 +112,8 @@
     "L" : "لتر",
     "upgrade_your_account" : " ترقية حسابك",
     "upgrade_your_account_des" : "اضمن لعملائك الاستمرارية بعد الفترة التجريبية",
-    "store_des" : "وصف المتجر"
+    "store_des" : "وصف المتجر",
+    "store_des_hint" : "ادخل وصف المتجر"
+
    
 }
