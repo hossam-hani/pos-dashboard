@@ -16,6 +16,9 @@ import 'screens/orders/ordersList.dart';
 import 'screens/selectCategory.dart';
 import 'screens/shop_details.dart';
 import 'screens/splash.dart';
+import './screens/regions/regionsList.dart';
+import './screens/regions/regionsEditor.dart';
+import './screens/points/pointsEditor.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings){
@@ -51,11 +54,15 @@ class RouteGenerator {
       case '/product_editor' :
         return MaterialPageRoute(builder: (_) => ProductEditor(product: args,));    
       case '/login' :
-        return MaterialPageRoute(builder: (_) => Login());    
+        return MaterialPageRoute(builder: (_) => Login());  
+      case '/points_editor' :
+        return MaterialPageRoute(builder: (_) => PointsEditor());  
       case '/edit_shop_details' :
         return MaterialPageRoute(builder: (_) => ShopDetials());    
-
-          
+      case '/regions' :
+        return MaterialPageRoute(builder: (_) => RegionsList());    
+      case '/region_editor' :
+        return MaterialPageRoute(builder: (_) => RegionEditor(region: args,));         
     }
   
     return null;

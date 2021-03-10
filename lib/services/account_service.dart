@@ -59,5 +59,31 @@ class AccountService{
     }
     return null;
   }
+
+    static Future<void> addTokenToUser({String token}) async {
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+
+        Dio dio = new Dio();
+        dio.options.headers['content-Type'] = 'application/json';
+        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+
+
+    try {
+
+      Response response = await dio.post("$baseUrl/user/token",data: {
+        "token" : token,
+      });
+
+   
+      
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  
   
 }

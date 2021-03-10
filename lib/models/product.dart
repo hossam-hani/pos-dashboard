@@ -5,14 +5,18 @@ class Product {
   int id;
   String name;
   String description;
-  int price;
-  int cost;
+  double price;
+  double cost;
   String unitType;
   int categoryId;
   bool isActive;
   List<Images> images;
   Category category;
   String currency;
+
+  int index;
+  double priceAfterDiscount;
+  bool stockStatus;
 
   Product(
       {this.id,
@@ -25,17 +29,24 @@ class Product {
       this.isActive,
       this.images,
       this.category,
-      this.currency});
+      this.currency,
+      this.index,
+      this.priceAfterDiscount,
+      this.stockStatus});
 
   Product.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     description = json['description'];
-    price = json['price'];
-    cost = json['cost'];
+    price = json['price'] == null ? 0.0 : json['price'].toDouble() ;
+    cost = json['cost'] == null ? 0.0 : json['cost'].toDouble() ;
     unitType = json['unit_type'];
     categoryId = json['category_id'];
     isActive = json['is_active'] == 0 ? false : true;
+
+    stockStatus = json['stock_status'] == 0 ? false : true;
+    priceAfterDiscount = json['price_after_discount'] == null ? null : json['price_after_discount'].toDouble() ;
+    index = int.parse(json['index'].toString());
     if (json['images'] != null) {
       images = new List<Images>();
       json['images'].forEach((v) {
@@ -58,6 +69,11 @@ class Product {
     data['unit_type'] = this.unitType;
     data['category_id'] = this.categoryId;
     data['is_active'] = this.isActive;
+
+    data['stock_status'] = this.stockStatus;
+    data['price_after_discount'] = this.priceAfterDiscount;
+    data['index'] = this.index;
+
     if (this.images != null) {
       data['images'] = this.images.map((v) => v.toJson()).toList();
     }

@@ -2,9 +2,9 @@ import 'product.dart';
 
 class Items {
   int id;
-  int price;
-  int cost;
-  int quantity;
+  double price;
+  double cost;
+  double quantity;
   String notes;
   Product product;
 
@@ -18,9 +18,9 @@ class Items {
 
   Items.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    price = json['price'];
-    cost = json['cost'];
-    quantity = json['quantity'];
+    price = json['price'] == null ? 0.0 : json['price'].toDouble() ;
+    cost = json['cost'] == null ? 0.0 : json['cost'].toDouble() ;
+    quantity = json['quantity'].toDouble() ;
     notes = json['notes'];
     product =
         json['product'] != null ? new Product.fromJson(json['product']) : null;

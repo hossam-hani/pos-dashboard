@@ -36,7 +36,8 @@ class ProductServices{
     static Future<Product> saveProduct({String name,String description
     , bool isActive, List<String> images, String id,
     String categoryId,double price,double cost,
-    String unitType}) async {
+    String unitType,double priceAfterDiscount
+    , bool stockStatus, int index}) async {
       
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
@@ -55,7 +56,10 @@ class ProductServices{
           "is_active" : isActive,
           "description" : description,
           "unit_type" : unitType,
-          "images" : jsonEncode(images)
+          "images" : jsonEncode(images),
+          "index" : index,
+          "stock_status" : stockStatus,
+          "price_after_discount" : priceAfterDiscount,
         } : {
           "name" : name,
           "price" : price,
@@ -64,6 +68,9 @@ class ProductServices{
           "is_active" : isActive,
           "unit_type" : unitType,
           "description" : description,
+          "index" : index,
+          "stock_status" : stockStatus,
+          "price_after_discount" : priceAfterDiscount,
         },  options: Options(
             followRedirects: false,
             validateStatus: (status) {

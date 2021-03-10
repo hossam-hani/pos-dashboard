@@ -5,7 +5,7 @@ import 'items.dart';
 class Order {
   int id;
   String currency;
-  int total;
+  double total;
   String status;
   Customer customer;
   Address address;
@@ -27,7 +27,7 @@ class Order {
   Order.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     currency = json['currency'];
-    total = json['total'];
+    total = json['total'] == null ? 0.0 : json['total'].toDouble() ;
     status = json['status'];
     customer = json['customer'] != null
         ? new Customer.fromJson(json['customer'])

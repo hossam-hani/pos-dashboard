@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1011985221245",
+    "project_id": "eckit-3b7ea",
+    "storage_bucket": "eckit-3b7ea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1011985221245:android:e12b66af36fc7b08529314",
+        "android_client_info": {
+          "package_name": "com.rizme.eckit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1011985221245-bskmi4li12tdsjetetuo1kaohtema077.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD04bswxRSQULtxZBUo8rlE6A5cZOC2swo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1011985221245-bskmi4li12tdsjetetuo1kaohtema077.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

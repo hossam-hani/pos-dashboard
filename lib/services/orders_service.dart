@@ -43,6 +43,7 @@ class OrderServices{
       
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+      print(jsonDecode(prefs.getString("account")));
 
       try {
         Dio dio = new Dio();

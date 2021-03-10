@@ -34,6 +34,8 @@ class _ShopDetialsState extends State<ShopDetials> {
    TextEditingController fbLink = new TextEditingController();
    TextEditingController instaLink = new TextEditingController();
    TextEditingController descriptionLink = new TextEditingController();
+   TextEditingController gaId = new TextEditingController();
+   TextEditingController pixelId = new TextEditingController();
 
    bool _isActive = true;
    bool isLoading = false;
@@ -124,6 +126,8 @@ class _ShopDetialsState extends State<ShopDetials> {
       ,sliderimage_3: base64Image3
       ,sliderimage_4: base64Image4
       ,sliderimage_5: base64Image5,
+      gaId: gaId.text,
+      pixelId: pixelId.text,
       isActive: _isActive,
       logo: base64Logo);
     }
@@ -155,6 +159,8 @@ class _ShopDetialsState extends State<ShopDetials> {
       instaLink.text = shop.instagramLink;
       descriptionLink.text = shop.description;
       _isActive = shop.isActive;
+      gaId.text = shop.gaId;
+      pixelId.text = shop.pixelId;
       image6 = shop.logo;
       image1 = shop.sliderimage1;
       image2 = shop.sliderimage2;
@@ -264,7 +270,7 @@ class _ShopDetialsState extends State<ShopDetials> {
                   labelTxt: "store_des".tr(),
                 ),
                 
-              SizedBox(height: 20,),
+                    SizedBox(height: 20,),
 
                 Row(children: [
     
@@ -286,6 +292,29 @@ class _ShopDetialsState extends State<ShopDetials> {
                 SizedBox(height: 20,),
 
                 Divider(),
+
+               SizedBox(height: 15,),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("analysis_integration".tr(),style: TextStyle(fontSize: 20),),
+                ),
+                Divider(),
+
+                CustomeTextField(
+                  controller:  gaId,
+                  hintTxt: "ga_id_hint".tr(),
+                  labelTxt: "ga_id_des".tr(),
+                ),
+                
+                CustomeTextField(
+                  controller:  pixelId,
+                  hintTxt: "fb_id_hint".tr(),
+                  labelTxt: "fb_id_des".tr(),
+                ),
+              SizedBox(height: 20,),
+
+              SizedBox(height: 15,),
+
 
                 SizedBox(height: 30,),
                 Padding(

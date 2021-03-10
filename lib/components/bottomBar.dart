@@ -63,6 +63,7 @@ class _BottomBarState extends State<BottomBar> {
             icon: FaIcon(FontAwesomeIcons.cartArrowDown),
             label: 'الطلبات',
           ),
+
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.store),
             label: 'المتجر',

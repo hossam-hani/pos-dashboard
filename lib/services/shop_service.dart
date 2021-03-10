@@ -39,7 +39,8 @@ class ShopService{
     static Future<Shop> saveDetails({String whatsapp_contact,String phone_number, 
     String facebook_link,String instagram_link,String description,
     String sliderimage_1,String sliderimage_2,String sliderimage_3,String sliderimage_4,String sliderimage_5,
-    bool isActive , String logo}) async {
+    bool isActive , String logo
+    , String gaId, String pixelId}) async {
       
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
@@ -62,6 +63,8 @@ class ShopService{
           "sliderimage_5" : sliderimage_5,
           "is_active" : isActive,
           "logo" : logo,
+          "ga_id" : gaId,
+          "pixel_id" : pixelId,
         });
 
         Shop temp;

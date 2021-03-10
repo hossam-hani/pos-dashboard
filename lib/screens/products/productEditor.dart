@@ -30,8 +30,13 @@ class _ProductEditorState extends State<ProductEditor> {
   TextEditingController description = new TextEditingController();
   TextEditingController cost = new TextEditingController();
   TextEditingController price = new TextEditingController();
+  TextEditingController rank = new TextEditingController();
+  TextEditingController priceAfterDiscount = new TextEditingController();
+
+  
 
   bool _isActive = true;
+  bool _stockStatus = true;
   bool isLoading = false;
   String image;
   Category currentCategory;
@@ -101,6 +106,9 @@ class _ProductEditorState extends State<ProductEditor> {
         unitType: currentUnit,
         price: double.parse(price.text),
         categoryId: currentCategory.id.toString(),
+        priceAfterDiscount: priceAfterDiscount.text == "" ? null : double.parse(priceAfterDiscount.text),
+        stockStatus: _stockStatus,
+        index: int.parse(rank.text)
       );
     }
 
@@ -152,6 +160,9 @@ class _ProductEditorState extends State<ProductEditor> {
         name.text = widget.product.name;
         cost.text = widget.product.cost.toString();
         price.text = widget.product.price.toString();
+        priceAfterDiscount.text = widget.product.priceAfterDiscount == null ? null : widget.product.priceAfterDiscount.toString();
+        _stockStatus = widget.product.stockStatus;
+        rank.text = widget.product.index.toString();
         description.text = widget.product.description;
         _isActive = widget.product.isActive;
         currentUnit = widget.product.unitType;
@@ -263,6 +274,40 @@ class _ProductEditorState extends State<ProductEditor> {
                         hintTxt: "description_hint".tr(),
                         labelTxt: "description_label".tr(),
                       ),
+
+                      CustomeTextField(
+                        controller: rank,
+                        hintTxt: "rank_hint".tr(),
+                        labelTxt: "rank_label".tr(),
+                      ),
+
+
+                      CustomeTextField(
+                        controller: priceAfterDiscount,
+                        hintTxt: "price_after_discount_hint".tr(),
+                        labelTxt: "price_after_discount_label".tr(),
+                      ),
+
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          CupertinoSwitch(
+                            value: _stockStatus,
+                            onChanged: (value) {
+                              setState(() {
+                                _stockStatus = value;
+                              });
+                            },
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Text(_stockStatus ? "available_in_stock".tr() : "not_available_in_stock".tr())
+                        ],
+                      ),
+
                       SizedBox(
                         height: 20,
                       ),

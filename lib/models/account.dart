@@ -92,6 +92,9 @@ class Shop {
   String sliderimage3;
   String sliderimage4;
   String sliderimage5;
+  String gaId;
+  String pixelId;
+        
   bool isActive;
 
   Shop(
@@ -118,7 +121,9 @@ class Shop {
       this.sliderimage3,
       this.sliderimage4,
       this.sliderimage5,
-      this.isActive});
+      this.isActive,
+      this.gaId,
+      this.pixelId});
 
   Shop.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -144,6 +149,8 @@ class Shop {
     sliderimage3 = json['sliderimage_3'];
     sliderimage4 = json['sliderimage_4'];
     sliderimage5 = json['sliderimage_5'];
+    gaId = json['ga_id'];
+    pixelId = json['pixel_id'];
     isActive = json['is_active'] == 0 ? false : true;
   }
 
@@ -172,6 +179,8 @@ class Shop {
     data['sliderimage_3'] = this.sliderimage3;
     data['sliderimage_4'] = this.sliderimage4;
     data['sliderimage_5'] = this.sliderimage5;
+    data['ga_id'] = this.gaId;
+    data['pixel_id'] = this.pixelId;
     data['is_active'] = this.isActive;
     return data;
   }
