@@ -29,35 +29,37 @@ class OrderItems extends StatelessWidget {
           title: Image.asset("assets/images/logo.png" , height: 70,)
         ),
         backgroundColor: Colors.white,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        body: SingleChildScrollView(
+                  child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child:   Text(
-              'order_items'.tr(),
-              style: TextStyle(  
-                fontSize: 20,
-                color: const Color(0xff000000),
-                fontWeight: FontWeight.w500,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child:   Text(
+                'order_items'.tr(),
+                style: TextStyle(  
+                  fontSize: 20,
+                  color: const Color(0xff000000),
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,  
               ),
-              textAlign: TextAlign.center,  
             ),
-          ),
 
-            ... items.map((item) => ListItem(
-                        title: item.product.name.toString(),
-                        id: item.product.id.toString(),
-                        price: item.product.price.toString(),
-                        currency: item.product.currency,
-                        category: item.product.category.name.toString(),
-                        quantity: item.quantity.toString(),
-                        notes: item.notes.toString(),
-                        unit: item.product.unitType,
-                        image: item.product.images.isNotEmpty ? item.product.images.first.imageUrl : null,)).toList()
-           
-        ],),
+              ... items.map((item) => ListItem(
+                          title: item.product.name.toString(),
+                          id: item.product.id.toString(),
+                          price: item.product.price.toString(),
+                          currency: item.product.currency,
+                          category: item.product.category.name.toString(),
+                          quantity: item.quantity.toString(),
+                          notes: item.notes.toString(),
+                          unit: item.product.unitType,
+                          image: item.product.images.isNotEmpty ? item.product.images.first.imageUrl : null,)).toList()
+             
+          ],),
+        ),
     );
   }
 }

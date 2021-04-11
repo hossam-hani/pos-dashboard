@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:eckit/components/customeButton.dart';
+import 'package:eckit/models/Attribute.dart';
 import 'package:eckit/models/category.dart';
+import 'package:eckit/models/option.dart';
 import 'package:eckit/models/product.dart';
 import 'package:eckit/services/categories_service.dart';
 import 'package:eckit/services/product_service.dart';
@@ -42,6 +45,28 @@ class _ProductEditorState extends State<ProductEditor> {
   Category currentCategory;
   String currentUnit;
   List<File> images = [];
+
+  List<Attribute> attrbuites = [
+    Attribute(
+      title: "Size",
+      isRequired: true,
+      type: "radio",
+      options: [
+        Option(
+          title: "Small",
+          description: "small size 50*60",
+          stockStatus: true,
+          addedPrice: 0
+          ),
+      ]
+      ),
+    Attribute(
+      title: "extera",
+      isRequired: true,
+      type: "checkbox",
+      options: []
+      )
+  ];
 
   //  File _image;
   final picker = ImagePicker();
@@ -169,6 +194,8 @@ class _ProductEditorState extends State<ProductEditor> {
         currentCategory = widget.product.category;
         imagesUrl = widget.product.images;
       });
+    }else{
+      rank.text = "1";
     }
 
     setState(() {
@@ -181,6 +208,10 @@ class _ProductEditorState extends State<ProductEditor> {
   void initState() {
     super.initState();
     initValues();
+  }
+
+  updateWidget(){
+    setState(() {});
   }
 
   @override
@@ -277,6 +308,7 @@ class _ProductEditorState extends State<ProductEditor> {
 
                       CustomeTextField(
                         controller: rank,
+                        validator: Validator.notEmpty,
                         hintTxt: "rank_hint".tr(),
                         labelTxt: "rank_label".tr(),
                       ),
@@ -367,6 +399,23 @@ class _ProductEditorState extends State<ProductEditor> {
                           Text(_isActive ? "active".tr() : "not_active".tr())
                         ],
                       ),
+
+                      SizedBox(height: 20,),
+
+                    //   ExpansionTile(
+                    //   title: Text("advance_option".tr()),
+                    //   children: [
+                    //   ... attrbuites.map((attrbuite) => AttributeW(
+                    //     title: attrbuite.title,
+                    //     type: attrbuite.type,
+                    //     isRequired: attrbuite.isRequired,
+                    //     attribute: attrbuite,
+                    //     updateWidget: updateWidget,
+                    //   )).toList(),        
+                    //   CustomeButton(title: "add_new_attribute",icon: FontAwesomeIcons.plus ),
+                    //   ],
+                    //  ),
+
                       SizedBox(
                         height: 20,
                       ),
@@ -563,11 +612,225 @@ class _ProductEditorState extends State<ProductEditor> {
   }
 }
 
+
+class AttributeW extends StatelessWidget {
+        String title;
+        bool isRequired;
+        String type;
+        Attribute attribute;
+        dynamic updateWidget;
+
+        AttributeW({this.title,this.isRequired,this.type,this.attribute,this.updateWidget});
+
+        @override
+        Widget build(BuildContext context) {
+          return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+           CustomeTextField(
+            validator: Validator.notEmpty,
+            hintTxt: "attribute_hint".tr(),
+            labelTxt: "attribute_label".tr(),
+            controller: TextEditingController(text: title),
+            changeHandler: (newVal) => attribute.setTitle = newVal,
+           ),
+
+          SizedBox(height: 10,),
+
+          CustomeSwitchW(
+            option1: "is_required".tr(),
+            option2: "is_not_required".tr(),
+            initValue: attribute.isRequired,
+            changeHandler: (newValue) => attribute.setIsRequired = newValue
+          ),
+
+          CustomeSwitchW(
+            option1: "radio".tr(),
+            option2: "checkbox".tr(),
+            trackColor: Colors.blue, 
+            activeColor: Colors.pink,
+            initValue: attribute.type == "radio",
+            changeHandler: (newValue) => attribute.setIsRequired = newValue
+          ),
+
+         attribute.options == null ? SizedBox() : Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(children: [
+              ... attribute.options.map((option) => OptionW(
+                title: option.title,
+                stockStatus: option.stockStatus,
+                description: option.description,
+                addedPrice: option.addedPrice.toString(),
+                option: option,
+                deleteHandler: attribute.removeOption,
+                updateWidget: updateWidget,
+                index : attribute.options.indexOf(option)
+              )).toList()
+            ],),
+          ),
+                                     
+          SizedBox(height: 10,),
+
+          SizedBox(
+            width: 200,
+            child: CustomeButton(title: "add_option",icon: FontAwesomeIcons.plus,
+            handler: () {
+              attribute.addOption();
+              updateWidget();
+             } ),
+          ),
+
+          SizedBox(height: 10,),
+          Divider(),
+          SizedBox(height: 10,),
+
+    ],);
+  }
+}
+
+
+class OptionW extends StatelessWidget {
+  String title;
+  String addedPrice;
+  String description;
+  bool stockStatus;
+  Option option;
+  dynamic deleteHandler;
+  dynamic updateWidget;
+  int index;
+  
+
+  OptionW({this.addedPrice,this.title,
+  this.stockStatus,this.description,
+  this.option,this.updateWidget,this.deleteHandler,this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+                                  
+           CustomeTextField(
+            validator: Validator.notEmpty,
+            hintTxt: "option_hint".tr(),
+            labelTxt: "option_label".tr(),
+            controller: TextEditingController(text: option.title),
+            changeHandler: (newVal) => option.setTitle = newVal,
+           ),
+
+           CustomeTextField(
+            validator: Validator.notEmpty,
+            hintTxt: "option_hint_des".tr(),
+            labelTxt: "option_label_des".tr(),
+            controller: TextEditingController(text: option.description),
+            changeHandler: (newVal) => option.setDescription = newVal,
+           ),
+
+           CustomeTextField(
+            validator: Validator.notEmpty,
+            hintTxt: "added_price_hint".tr(),
+            labelTxt: "added_price_label".tr(),
+            controller: TextEditingController(text: option.addedPrice == null ? null : option.addedPrice.toString(),),
+            changeHandler: (newVal) => option.setAddedPrice = newVal,
+           ),
+
+          SizedBox(height: 10,),
+      
+          CustomeSwitchW(
+            option1: "available_in_stock".tr(),
+            option2: "not_available_in_stock".tr(),
+            initValue: stockStatus,
+            changeHandler: (newValue) => option.setNewStockStatus = newValue
+          ),
+          
+          CustomeButton(title: "delete".tr(),icon: FontAwesomeIcons.trash,handler: (){
+            deleteHandler(index);
+            updateWidget();
+          },)
+
+
+
+    ],);
+  }
+}
+
+
+
+
+
+
+
+// ignore: must_be_immutable
+class CustomeSwitchW extends StatefulWidget {
+  String option1;
+  String option2;
+  dynamic changeHandler;
+  bool initValue;
+  Color trackColor;
+  Color activeColor;
+
+  CustomeSwitchW({this.option1,this.option2,this.changeHandler,this.initValue,
+  this.activeColor = Colors.green ,this.trackColor = Colors.grey });
+
+  @override
+  _CustomeSwitchWState createState() => _CustomeSwitchWState();
+}
+
+class _CustomeSwitchWState extends State<CustomeSwitchW> {
+
+  bool initValue;
+  
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      initValue = widget.initValue;
+    });
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Row(children: [
+              CupertinoSwitch(
+                trackColor: widget.trackColor,
+                activeColor: widget.activeColor,
+                value: initValue,
+                onChanged: (value){
+                  widget.changeHandler(value);
+                  setState(() {
+                    initValue = value;
+                  });
+                },
+              ),
+              SizedBox(
+                width: 15,
+              ),
+              Text(initValue ? widget.option1 : widget.option2)
+            ],
+          ),
+
+          SizedBox(height: 10,),
+
+    ],);
+  }
+}
+
+
+
+
+
+
+
+
+
+
 class CustomeTextField extends StatelessWidget {
   String hintTxt;
   String labelTxt;
   TextEditingController controller;
   dynamic validator;
+  dynamic changeHandler;
   bool obscureTextbool;
   bool isNumber;
 
@@ -577,7 +840,8 @@ class CustomeTextField extends StatelessWidget {
       this.controller,
       this.validator,
       this.obscureTextbool = false,
-      this.isNumber = false});
+      this.isNumber = false,
+      this.changeHandler});
 
   @override
   Widget build(BuildContext context) {
@@ -586,6 +850,7 @@ class CustomeTextField extends StatelessWidget {
       obscureText: obscureTextbool,
       validator: validator,
       controller: controller,
+      onChanged: (newVal) => changeHandler(newVal),
       decoration: new InputDecoration(
           hintText: hintTxt,
           labelText: labelTxt,

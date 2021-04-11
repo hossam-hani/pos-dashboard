@@ -13,17 +13,26 @@ import 'package:easy_localization/easy_localization.dart';
 
 class ProductServices{
 
-  static Future<List<Product>> getProducts(String currentPage) async {
+  static Future<List<Product>> getProducts(String currentPage, String categoryId) async {
       
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+
+      
+   
 
       try {
         Dio dio = new Dio();
         dio.options.headers['content-Type'] = 'application/json';
         dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+        Response response;
 
-        Response response = await dio.get("$baseUrl/products?page=$currentPage");
+        if(categoryId != null){
+          response = await dio.get("$baseUrl/products/category/$categoryId?page=$currentPage");
+        }else{
+         response = await dio.get("$baseUrl/products?page=$currentPage");
+        }
+
         List<Product> temp = [];
         response.data["data"].forEach((post) => temp.add(Product.fromJson(post)));
         return temp;

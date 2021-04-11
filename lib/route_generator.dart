@@ -3,6 +3,7 @@ import 'package:eckit/screens/create_account.dart';
 import 'package:eckit/screens/home.dart';
 import 'package:eckit/screens/intro.dart';
 import 'package:eckit/screens/products/productEditor.dart';
+import 'package:eckit/screens/products/productList.dart';
 import 'package:flutter/material.dart';
 import 'screens/account_details.dart';
 import 'screens/categories/categoryEditor.dart';
@@ -38,7 +39,9 @@ class RouteGenerator {
       case '/home' :
         return MaterialPageRoute(builder: (_) => Home());   
       case '/orders' :
-        return MaterialPageRoute(builder: (_) => OrderList(keyword: (args as Map)["keyword"],customerID: (args as Map)["customerId"],));     
+        return MaterialPageRoute(builder: (_) => OrderList(keyword: (args as Map)["keyword"],customerID: (args as Map)["customerId"],));    
+      case '/products' :
+        return MaterialPageRoute(builder: (_) => ProductList(categoryId: args,));   
       case '/orders_items' :
         return MaterialPageRoute(builder: (_) => OrderItems(items: args,));    
       case '/change_status' :

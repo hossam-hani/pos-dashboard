@@ -1,3 +1,5 @@
+import 'package:eckit/models/category.dart';
+import 'package:eckit/services/categories_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../components/customeButton.dart';
@@ -13,16 +15,18 @@ class ProductList extends StatefulWidget {
 
   dynamic changePageHandler;
   dynamic changeCurrentIndex;
+  String categoryId;
+  
 
-  ProductList({this.changePageHandler,this.changeCurrentIndex});
+  ProductList({this.changePageHandler,this.changeCurrentIndex,this.categoryId});
 
   @override
   _ProductListState createState() => _ProductListState();
 }
 
 class _ProductListState extends State<ProductList> {
-
-   List<Product> products = [];
+  List<Category> categories;
+  List<Product> products = [];
   int currentPage = 1;
   bool isLoading = false;
   
@@ -40,7 +44,8 @@ class _ProductListState extends State<ProductList> {
 
   Future<List<Product>> getProductsLocal() async {
 
-    List<Product> temp = await ProductServices.getProducts(currentPage.toString());
+
+    List<Product> temp = await ProductServices.getProducts(currentPage.toString(), widget.categoryId);
 
     print(temp);
     setState(() {
@@ -52,9 +57,18 @@ class _ProductListState extends State<ProductList> {
     return temp;
   }
 
+  getCategories() async {
+    List<Category> temp = await CategoryServices.getAllCategories();
+    
+    setState(() {
+      categories = temp;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getCategories();
     setState(() {
       isLoading =  true;
     });
@@ -63,43 +77,110 @@ class _ProductListState extends State<ProductList> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+    return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: widget.categoryId == null
+          ? null
+          : AppBar(
+              elevation: 0,
+              toolbarHeight: 100,
+              backgroundColor: Colors.white,
+              automaticallyImplyLeading: false,
+              leading: new IconButton(
+                icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              title: Image.asset(
+                "assets/images/logo.png",
+                height: 70,
+              )),
+          body: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
-            Row(children: [
-              FaIcon(FontAwesomeIcons.boxes),
-              SizedBox(width: 10,),
-              Text("products".tr(),style: TextStyle(fontSize: 20),)
+              Row(children: [
+                FaIcon(FontAwesomeIcons.boxes),
+                SizedBox(width: 10,),
+                Text("products".tr(),style: TextStyle(fontSize: 20),)
+              ],),
+              SizedBox(height: 15,),
+
+              widget.categoryId != null ? SizedBox() : Row(children: [   
+              CustomeButton(title: "add_product",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/product_editor'),),
+              CustomeButton(title: "categories",icon: FontAwesomeIcons.tags,handler: () => widget.changeCurrentIndex(5),),
+              Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                  InkWell(
+                  onTap: (){
+                        showDialog(
+                          context: context,
+                          builder: (_) => new AlertDialog(
+                                title: new Text("search".tr()),
+                                content: Column(children: [
+                                                                  categories == null
+                          ? SizedBox()
+                          : DropdownButton<Category>(
+                              isExpanded: true,
+                              items: categories.map((Category category) {
+                                return new DropdownMenuItem<Category>(
+                                  value: category,
+                                  child: new Text(category.name),
+                                );
+                              }).toList(),
+                              hint: Text("select_category_hint".tr()),
+                              onChanged: (newValue) {
+                                 Navigator.of(context).pop();
+                                 Navigator.pushNamed(context, '/products',arguments: newValue.id.toString());
+                              },
+                            ),
+                                ],),
+                                actions: <Widget>[
+                                  FlatButton(
+                                    child: Text('close'.tr()),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  )
+                                ],
+                              ));
+
+                  },
+                  child: FaIcon(FontAwesomeIcons.filter)),
+                  SizedBox(width: 10,)
+             
+                ],),
+              )
+
+              ],),
+
+    
+
+              products.isEmpty && !isLoading ? ProductPlaceholder() : SizedBox(),
+              products.isEmpty && !isLoading ? SizedBox() : Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                        child: Pagination(
+                        progress: loadingKit,
+                        pageBuilder: (currentListSize) => getProductsLocal(),
+                        itemBuilder: (index, Product product) => ListItem(
+                          title: product.name.toString(),
+                          id: product.id.toString(),
+                          price: product.price.toString(),
+                          currency: product.currency,
+                          category: product.category.name.toString(),
+                          product: product,
+                          image: product.images.isNotEmpty ? product.images.first.imageUrl : null,),
+                            ),
+                      ),
+              ),
+
+
             ],),
-            SizedBox(height: 15,),
-
-            Row(children: [   
-            CustomeButton(title: "add_product",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/product_editor'),),
-            CustomeButton(title: "categories",icon: FontAwesomeIcons.tags,handler: () => widget.changeCurrentIndex(5),),
-            ],),
-
-            products.isEmpty && !isLoading ? ProductPlaceholder() : SizedBox(),
-            products.isEmpty && !isLoading ? SizedBox() : Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                      child: Pagination(
-                      progress: loadingKit,
-                      pageBuilder: (currentListSize) => getProductsLocal(),
-                      itemBuilder: (index, Product product) => ListItem(
-                        title: product.name.toString(),
-                        id: product.id.toString(),
-                        price: product.price.toString(),
-                        currency: product.currency,
-                        category: product.category.name.toString(),
-                        product: product,
-                        image: product.images.isNotEmpty ? product.images.first.imageUrl : null,),
-                          ),
-                    ),
-            ),
-
-
-          ],);
+    );
   }
 }
 

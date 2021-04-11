@@ -1,3 +1,4 @@
+import 'Attribute.dart';
 import 'image.dart';
 import 'category.dart';
 
@@ -13,10 +14,10 @@ class Product {
   List<Images> images;
   Category category;
   String currency;
-
   int index;
   double priceAfterDiscount;
   bool stockStatus;
+  List<Attribute> attributes;
 
   Product(
       {this.id,
@@ -32,6 +33,7 @@ class Product {
       this.currency,
       this.index,
       this.priceAfterDiscount,
+      this.attributes,
       this.stockStatus});
 
   Product.fromJson(Map<String, dynamic> json) {
@@ -56,6 +58,14 @@ class Product {
     category = json['category'] != null
         ? new Category.fromJson(json['category'])
         : null;
+
+    if (json['attributes'] != null) {
+      attributes = new List<Attribute>();
+      json['attributes'].forEach((v) {
+        attributes.add(new Attribute.fromJson(v));
+      });
+    }
+
     currency = json['currency'];
   }
 
@@ -77,9 +87,16 @@ class Product {
     if (this.images != null) {
       data['images'] = this.images.map((v) => v.toJson()).toList();
     }
+
+    if (this.attributes != null) {
+      data['attributes'] = this.attributes.map((v) => v.toJson()).toList();
+    }
+
     if (this.category != null) {
       data['category'] = this.category.toJson();
     }
+
+    
     data['currency'] = this.currency;
     return data;
   }
