@@ -40,8 +40,8 @@ class Product {
     id = json['id'];
     name = json['name'];
     description = json['description'];
-    price = json['price'] == null ? 0.0 : json['price'].toDouble() ;
-    cost = json['cost'] == null ? 0.0 : json['cost'].toDouble() ;
+    price = json['price'] == null ? 0.0 :  double.parse( json['price'].toString()) ;
+    cost = json['cost'] == null ? 0.0 :  double.parse( json['cost'].toString()) ;
     unitType = json['unit_type'];
     categoryId = json['category_id'];
     isActive = json['is_active'] == 0 ? false : true;

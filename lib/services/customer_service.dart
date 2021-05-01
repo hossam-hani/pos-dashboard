@@ -15,6 +15,8 @@ class CustomerServices{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
 
+      if(keyword == "") return [];
+      
       try {
         Dio dio = new Dio();
         dio.options.headers['content-Type'] = 'application/json';

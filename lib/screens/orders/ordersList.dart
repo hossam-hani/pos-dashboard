@@ -161,12 +161,13 @@ class _OrderListState extends State<OrderList> {
                           itemBuilder: (index, Order order) => ListItem(
                             id: order.id.toString(),
                             time: timeago.format(
-                                (DateTime.parse(order.createdAt)),
-                                locale: 'ar'),
+                            (DateTime.parse(order.createdAt)),
+                            locale: 'ar'),
                             total: order.total.toString(),
                             currency: order.currency.toString(),
                             status: order.status.toString(),
                             items: order.items,
+                            channel: order.channel,
                             address: order.address.address,
                             customerName: order.customer.name,
                             customerNumber: order.customer.phoneNumber,
@@ -224,6 +225,7 @@ class ListItem extends StatelessWidget {
   String time;
   String status;
   String total;
+  String channel;
   String customerName;
   String customerNumber;
 
@@ -239,7 +241,7 @@ class ListItem extends StatelessWidget {
       this.currency,
       this.items,
       this.customerNumber,
-      this.customerName});
+      this.customerName,this.channel});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -275,6 +277,17 @@ class ListItem extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                Text(
+                  channel,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: const Color(0xffff7600),
+                    fontWeight: FontWeight.w300,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+
                 Text(
                   status.tr(),
                   style: TextStyle(

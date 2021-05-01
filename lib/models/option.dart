@@ -42,7 +42,7 @@ class Option {
     attributeId = json['attribute_id'];
     title = json['title'];
     description = json['description'];
-    addedPrice = json['added_price'];
+    addedPrice = double.parse(json['added_price'].toString());
     stockStatus = json['stock_status'] == 0 ? false : true;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];

@@ -16,12 +16,15 @@ class Items {
       this.notes,
       this.product});
 
+      
+
   Items.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    price = json['price'] == null ? 0.0 : json['price'].toDouble() ;
-    cost = json['cost'] == null ? 0.0 : json['cost'].toDouble() ;
+    price = json['price'] == null ? 0.0 : double.parse( json['price'].toString()) ;
+    cost = json['cost'] == null ? 0.0 : double.parse( json['cost'].toString()) ;
     quantity = json['quantity'].toDouble() ;
     notes = json['notes'];
+
     product =
         json['product'] != null ? new Product.fromJson(json['product']) : null;
   }

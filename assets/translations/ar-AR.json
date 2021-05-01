@@ -142,8 +142,49 @@
     "amount_label_points" : "عدد النقاط",
     "uid_label_points" : "رقم التعريفي للعميل",
     "scan_client_code" : "مسح الرقم التعريفي للعميل",
-    "credit" : "نقاط إضافية",
+    "credit" : "رصيد إضافي",
     "debit" : "خصم",
     "select_region_hint" : "اختر المنطقة الرئيسية",
-    "start_add_your_regions" : "ابدء في إضافة مناطق التوصيل"
+    "start_add_your_regions" : "ابدء في إضافة مناطق التوصيل",
+
+    "suppliers" : "الموردين",
+    "suppliers_des" : "إضافة / تعديل الموردين",
+    "stores" : "المخازن",
+    "stores_des" : "إضافة / تعديل المخازن",
+    "transactions" : "المعاملات",
+    "transactions_des" : "عرض و إضافة المعاملات",
+    "stocks" : "المخزون",
+    "stocks_des" : "عرض و إضافة المخزون",
+    "add_supplier" : "إضافة مورد",
+    "edit_supplier" : "تعديل مورد",
+    "name_hint_supplier" : "ادخل اسم المورد",
+    "name_label_supplier" : "اسم المورد",
+    "name_notes_supplier" : "ملاحظات حول المورد",
+    "add_store" : "إضافة مخزن",
+    "edit_store" : "تعديل مخزن",
+    "name_hint_store" : "ادخل اسم للمخزن",
+    "name_label_store" : "اسم المخزن",
+    "add_transaction" : "إضافة معاملة",
+    "amount" : "المبلغ",
+    "supplier" : "المورد",
+    "customer" : "العميل",
+    "select_customer_hint" : "اختر العميل",
+    "add_stock" : "إضافة مخزون",
+    "quantity_hint_stock" : "ادخل كمية المخزون",
+    "quantity_label_stock" : "الكمية",
+    "select_store_hint" : "اختر المخزن",
+    "product" : "المنتج",
+    "select_product_hint" : "اختر المنتج",
+
+    
+    "amount_hint_transcation" : "ادخل مبلغ المعاملة",
+    "amount_label_transcation" : "مبلغ المعاملة",
+    "reason_hint_transcation" : "ادخل بيان (وصف) المعاملة",
+    "reason_label_transcation" : "بيان (وصف) المعاملة",
+    "select_supplier_hint" : "اختر المورد"
+
+
+
+    
+
 }

@@ -41,7 +41,68 @@ class _DrawerContentState extends State<DrawerContent> {
             leading: FaIcon(FontAwesomeIcons.coins),
             isThreeLine: true,
           ),
-        )
+        ),
+
+
+        InkWell(
+            onTap: (){
+              Navigator.pushNamed(context, '/suppliers');
+            },
+            child: ListTile(
+            title: Text('suppliers'.tr()),
+            subtitle: Text(
+              'suppliers_des'.tr()
+            ),
+            leading: FaIcon(FontAwesomeIcons.users),
+            isThreeLine: true,
+          ),
+        ),
+
+
+        InkWell(
+            onTap: (){
+              Navigator.pushNamed(context, '/stores');
+            },
+            child: ListTile(
+            title: Text('stores'.tr()),
+            subtitle: Text(
+              'stores_des'.tr()
+            ),
+            leading: FaIcon(FontAwesomeIcons.warehouse),
+            isThreeLine: true,
+          ),
+        ),
+
+        InkWell(
+            onTap: (){
+              Navigator.pushNamed(context, '/transactions');
+            },
+            child: ListTile(
+            title: Text('transactions'.tr()),
+            subtitle: Text(
+              'transactions_des'.tr()
+            ),
+            leading: FaIcon(FontAwesomeIcons.dollarSign),
+            isThreeLine: true,
+          ),
+        ),
+
+
+        InkWell(
+            onTap: (){
+              Navigator.pushNamed(context, '/stocks');
+            },
+            child: ListTile(
+            title: Text('stocks'.tr()),
+            subtitle: Text(
+              'stocks_des'.tr()
+            ),
+            leading: FaIcon(FontAwesomeIcons.boxes),
+            isThreeLine: true,
+          ),
+        ),
+
+
       ],),
     );
   }

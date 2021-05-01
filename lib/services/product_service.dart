@@ -42,6 +42,34 @@ class ProductServices{
       return null;
   }
 
+
+  static Future<List<Product>> productsSearch(String keyword) async {
+      
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+
+      if(keyword == "") return [];
+      
+
+      try {
+        Dio dio = new Dio();
+        dio.options.headers['content-Type'] = 'application/json';
+        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+        Response response;
+
+        response = await dio.get("$baseUrl/products/searchusingbarcodeorname/${currentUser.shop.id}/$keyword");
+
+        print("$baseUrl/products/searchusingbarcodeorname/${currentUser.shop.id}/$keyword");
+        List<Product> temp = [];
+        response.data["data"].forEach((post) => temp.add(Product.fromJson(post)));
+        return temp;
+      } catch (e) {
+        print(e);
+      }
+      return null;
+  }
+
+
     static Future<Product> saveProduct({String name,String description
     , bool isActive, List<String> images, String id,
     String categoryId,double price,double cost,
