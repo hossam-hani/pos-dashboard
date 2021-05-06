@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../const.dart';
+
 class BottomBar extends StatefulWidget {
 
     dynamic changePageHandler;
@@ -71,7 +73,7 @@ class _BottomBarState extends State<BottomBar> {
 
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: mainColor,
         onTap: (index) => _onItemTapped(index),
       );
   }

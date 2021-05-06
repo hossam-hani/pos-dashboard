@@ -3,58 +3,49 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:eckit/models/account.dart';
 import 'package:eckit/models/category.dart';
+import 'package:eckit/models/store.dart';
+import 'package:eckit/models/supplier.dart';
+import 'package:eckit/services/account_service.dart';
 import 'package:eckit/services/categories_service.dart';
+import 'package:eckit/services/stores_service.dart';
+import 'package:eckit/services/suppliers_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../components/customeButton.dart';
-import '../../services/points_service.dart';
+
 import '../../const.dart';
 import '../../validator.dart';
-import 'package:majascan/majascan.dart';  
+import '../../models/region.dart';
+import '../../services/regions_service.dart';
 
-class PointsEditor extends StatefulWidget {
+class UsersEditor extends StatefulWidget {
+
+  User user;
+
+  UsersEditor({this.user});
 
   @override
-  _PointsEditorState createState() => _PointsEditorState();
+  _UsersEditorState createState() => _UsersEditorState();
 }
 
-class _PointsEditorState extends State<PointsEditor> {
+
+class _UsersEditorState extends State<UsersEditor> {
   
    final _formKey = GlobalKey<FormState>();
-   TextEditingController points = new TextEditingController();
-   TextEditingController uid = new TextEditingController();
-   bool _isCredit = true;
+   TextEditingController name = new TextEditingController();
+   TextEditingController email = new TextEditingController();
+   TextEditingController password = new TextEditingController();
+   TextEditingController phone = new TextEditingController();
+   String currentRole;
+   bool _isBlocked = false;
+
+
    bool isLoading = false;
-
-//  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-//   Barcode result;
-//   QRViewController controller;
-
-//   // In order to get hot reload to work we need to pause the camera if the platform
-//   // is android, or resume the camera if the platform is iOS.
-//   @override
-//   void reassemble() {
-//     super.reassemble();
-//     if (Platform.isAndroid) {
-//       controller.pauseCamera();
-//     } else if (Platform.isIOS) {
-//       controller.resumeCamera();
-//     }
-//   }
-
-//   void _onQRViewCreated(QRViewController controller) {
-//     this.controller = controller;
-//     controller.scannedDataStream.listen((scanData) {
-//       setState(() {
-//         result = scanData;
-//       });
-//     });
-//   }
 
 
 
@@ -68,10 +59,9 @@ class _PointsEditorState extends State<PointsEditor> {
         ),
         ],),
       );
-      
+ 
 
   save() async {
-
 
     setState(() {
       isLoading = true;
@@ -79,7 +69,15 @@ class _PointsEditorState extends State<PointsEditor> {
 
     if (_formKey.currentState.validate()) {
 
-      await PointsServices.addPointsToClient(uid: uid.text,amount: points.text,type: _isCredit ? "credit" : "debit");
+      await AccountService.saveUser(
+        name: name.text,
+        email: email.text,
+        password: password.text,
+        phone: phone.text,
+        role: currentRole,
+        isBlocked: _isBlocked,
+        id:widget.user == null ? null : widget.user.id.toString()
+        );
 
     }
 
@@ -89,10 +87,34 @@ class _PointsEditorState extends State<PointsEditor> {
 
   }
 
+  initValues() async {
+  
+  setState(() {
+      isLoading = true;
+  });
+
+
+  if(widget.user != null){
+
+    setState(() {
+      name.text = widget.user.name;
+      email.text = widget.user.email;
+      phone.text = widget.user.phone;
+      currentRole = widget.user.role;
+      _isBlocked = widget.user.isBlocked;
+    });
+  }
+
+    setState(() {
+      isLoading = false;
+  });
+
+  }
 
   @override
   void initState() {
     super.initState();
+    initValues();
   }
 
   @override
@@ -144,7 +166,7 @@ class _PointsEditorState extends State<PointsEditor> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child:   Text(
-                    "points".tr(),
+                    widget.user != null ? "edit_user".tr() : "add_user".tr(),
                     style: TextStyle(  
                       fontSize: 20,
                       color: const Color(0xff000000),
@@ -156,70 +178,69 @@ class _PointsEditorState extends State<PointsEditor> {
 
 
                 CustomeTextField(
-                  controller:  points,
+                  controller:  name,
                   validator: Validator.notEmpty,
-                  hintTxt: "amount_hint_points".tr(),
-                  labelTxt: "amount_label_points".tr(),
+                  hintTxt: "name_hint_user".tr(),
+                  labelTxt: "name_label_user".tr(),
                 ),
-
 
                 CustomeTextField(
-                  controller:  uid,
+                  controller:  email,
                   validator: Validator.notEmpty,
-                  hintTxt: "uid_hint_points".tr(),
-                  labelTxt: "uid_label_points".tr(),
+                  hintTxt: "email_hint_user".tr(),
+                  labelTxt: "email_label_user".tr(),
                 ),
 
-                SizedBox(height: 10,),
+               widget.user != null ? SizedBox() : CustomeTextField(
+                  controller:  password,
+                  validator: Validator.notEmpty,
+                  hintTxt: "password_hint_user".tr(),
+                  labelTxt: "password_label_user".tr(),
+                ),
+                
+                CustomeTextField(
+                  controller:  phone,
+                  validator: Validator.notEmpty,
+                  hintTxt: "phone_hint_user".tr(),
+                  labelTxt: "phone_label_user".tr(),
+                ),
 
-                CustomeButton(title: "scan_client_code",icon: FontAwesomeIcons.qrcode,handler: () async {
-                              String qrResult = await MajaScan.startScan(
-                          title: "قم بتصوير كود العميل", 
-                          barColor: Colors.black, 
-                          titleColor: Colors.white, 
-                          qRCornerColor: Colors.yellow,
-                          qRScannerColor: Colors.yellow,
-                          flashlightEnable: true, 
-                          scanAreaScale: 0.8 /// value 0.0 to 1.0
-                      );
+              SizedBox(height: 10,),
 
-                      setState(() {
-                        uid.text = qrResult;
-                      });
-              },),
+              new DropdownButton<String>(
+                isExpanded: true,
+                value: currentRole,
+                items: usersRolsList.map((String value) {
+                  return new DropdownMenuItem<String>(
+                    value: value,
+                    child: new Text(value.tr()),
+                  );
+                }).toList(),
+                onChanged: (newVal) {
+                  setState(() {
+                    currentRole = newVal;
+                  });
+                },
+              ),
+             SizedBox(height: 20,),
 
-
-
-           
-
-
-
-              SizedBox(height: 20,),
-
-                Row(children: [
+                widget.user == null ? SizedBox() : Row(children: [
     
                 CupertinoSwitch(
-                  value: _isCredit,
+                  value: _isBlocked,
                   onChanged: (value) {
                     setState(() {
-                      _isCredit = value;
+                      _isBlocked = value;
                     });
                   },
                 ),
 
                 SizedBox(width: 15,),
 
-                Text(_isCredit ? "credit".tr() : "debit".tr())
+                Text(_isBlocked ? "blockead".tr() : "active".tr())
 
                 ],),
-
-                SizedBox(height: 20,),
-
-          //       Expanded(child: QRView(
-          //     key: qrKey,
-          //     onQRViewCreated: _onQRViewCreated,
-          //   ),
-          // )
+  
                 
               ],),
             ),
@@ -236,8 +257,11 @@ class CustomeTextField extends StatelessWidget {
   TextEditingController controller;
   dynamic validator;
   bool obscureTextbool;
+  int minLines;
+  int maxLines;
 
-  CustomeTextField({this.hintTxt,this.labelTxt,this.controller,this.validator,this.obscureTextbool = false});
+  CustomeTextField({this.hintTxt,this.labelTxt,
+  this.controller,this.validator,this.obscureTextbool = false,this.maxLines,this.minLines});
 
   @override
   Widget build(BuildContext context) {
@@ -245,6 +269,8 @@ class CustomeTextField extends StatelessWidget {
             obscureText: obscureTextbool,
             validator: validator,
             controller: controller,
+            minLines: minLines,
+            maxLines: maxLines,
             decoration: new InputDecoration(
               hintText: hintTxt,
               labelText: labelTxt,

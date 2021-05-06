@@ -124,7 +124,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
           ),
           height: 80.0,
           decoration: BoxDecoration(
-            color: const Color(0xfff38a2e),
+            color: const Color(0xff1e272e),
           ),
         ),
       ),
@@ -139,7 +139,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
             Navigator.pop(context);
           },
         ),
-          title: Image.asset("assets/images/logo.png" , height: 70,)
+          title: Image.asset("assets/images/logo.png" , height: 40,)
         ),
         backgroundColor: Colors.white,
         body: SingleChildScrollView(

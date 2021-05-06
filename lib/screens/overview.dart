@@ -98,7 +98,7 @@ class _OrderListState extends State<OverView> {
             Navigator.pop(context);
           },
         ),
-          title: Image.asset("assets/images/logo.png" , height: 70,)
+          title: Image.asset("assets/images/logo.png" , height: 40,)
         ),
         backgroundColor: Colors.white,
           body: SafeArea(
@@ -224,7 +224,7 @@ class _OrderListState extends State<OverView> {
                               ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.0),
-                                color: const Color(0xffff7700),
+                                color: const Color(0xff1e272e),
                               ),
                             ),
                         ),

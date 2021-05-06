@@ -95,25 +95,25 @@ class _LoginState extends State<Login> {
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5.0),
-                          color: const Color(0xfff38a2e),
+                          color: const Color(0xff1e272e),
                         ),
                       ),
                     ),
 
                     SizedBox(height: 20,),
 
-                    InkWell(
-                      onTap: () => Navigator.pushNamed(context, '/'),
-                      child: Text(
-                        'create_new_account'.tr(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: const Color(0xff514e4e),
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                    )
+                    // InkWell(
+                    //   onTap: () => Navigator.pushNamed(context, '/'),
+                    //   child: Text(
+                    //     'create_new_account'.tr(),
+                    //     style: TextStyle(
+                    //       fontSize: 12,
+                    //       color: const Color(0xff514e4e),
+                    //       fontWeight: FontWeight.bold,
+                    //     ),
+                    //     textAlign: TextAlign.left,
+                    //   ),
+                    // )
 
 
         ],),

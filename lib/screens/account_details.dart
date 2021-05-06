@@ -142,7 +142,7 @@ class _AccountDetailsState extends State<AccountDetails> {
             toolbarHeight: 100,
             backgroundColor: Colors.white,
             automaticallyImplyLeading: false,
-            title:Image.asset("assets/images/logo.png" , height: 70,)
+            title:Image.asset("assets/images/logo.png" , height: 40,)
           ,),
           backgroundColor: Colors.white,
           bottomNavigationBar: InkWell(

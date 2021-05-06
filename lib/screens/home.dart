@@ -139,11 +139,21 @@ class _HomeState extends State<Home> {
           toolbarHeight: 100,
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
+          actions: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: InkWell(
+            onTap: () => Navigator.pushNamed(context, '/notifications'),
+            child: Center(child: FaIcon(FontAwesomeIcons.solidBell,color:Colors.black),),
+            ),
+              )
+          ],
           leading: InkWell(
             onTap: () => _drawerKey.currentState.openDrawer(),
             child: Center(child: FaIcon(FontAwesomeIcons.bars,color:Colors.black),),
             ),
-          title: Image.asset("assets/images/logo.png" , height: 70,)
+        
+          title: Image.asset("assets/images/logo.png" , height: 40,)
         ),
         body: SafeArea(
         child: Padding(

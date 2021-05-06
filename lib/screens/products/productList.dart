@@ -94,7 +94,7 @@ class _ProductListState extends State<ProductList> {
               ),
               title: Image.asset(
                 "assets/images/logo.png",
-                height: 70,
+                height: 40,
               )),
           body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

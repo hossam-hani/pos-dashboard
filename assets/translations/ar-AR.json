@@ -174,17 +174,29 @@
     "quantity_label_stock" : "الكمية",
     "select_store_hint" : "اختر المخزن",
     "product" : "المنتج",
-    "select_product_hint" : "اختر المنتج",
-
-    
+    "select_product_hint" : "اختر المنتج",    
     "amount_hint_transcation" : "ادخل مبلغ المعاملة",
     "amount_label_transcation" : "مبلغ المعاملة",
     "reason_hint_transcation" : "ادخل بيان (وصف) المعاملة",
     "reason_label_transcation" : "بيان (وصف) المعاملة",
-    "select_supplier_hint" : "اختر المورد"
-
-
-
-    
-
+    "select_supplier_hint" : "اختر المورد",
+    "notifcations" : "الإشعارات",
+    "users" : "المستخدمين",
+    "add_users" : "إضافة مستخدم",
+    "add_user" : "إضافة مستخدم",    
+    "edit_user" : "تعديل مستخدم",    
+    "name_hint_user" : "ادخل الاسم",
+    "name_label_user" : "الإسم",
+    "email_hint_user" : "ادخل البريد الالكتروني",
+    "email_label_user" : "البريد الالكتروني",
+    "password_hint_user" : "ادخل كلمة المرور",
+    "password_label_user" : "كلمة المرور",
+    "phone_hint_user" : "ادخل رقم الموبايل",
+    "phone_label_user" : "رقم الموبايل",
+    "blockead" : "محظور",
+    "admin" : "إدارة",
+    "cashier" : "الكاشير ( أمين الصندوق )",
+    "dispatcher" : "المرسل ( موزع الطلبات )",
+    "supervisor" : "مشرف",
+    "users_des" : "التحكم في المستخدمين كالمشرفين / الكاشير / الإدارة"
 }

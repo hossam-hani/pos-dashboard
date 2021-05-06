@@ -235,7 +235,7 @@ class _ProductEditorState extends State<ProductEditor> {
           ),
           height: 80.0,
           decoration: BoxDecoration(
-            color: const Color(0xfff38a2e),
+            color: const Color(0xff1e272e),
           ),
         ),
       ),
@@ -252,7 +252,7 @@ class _ProductEditorState extends State<ProductEditor> {
           ),
           title: Image.asset(
             "assets/images/logo.png",
-            height: 70,
+            height: 40,
           )),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(

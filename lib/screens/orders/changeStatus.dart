@@ -72,7 +72,7 @@ class _ChangeOrderDetailsState extends State<ChangeOrderDetails> {
             Navigator.pop(context);
           },
         ),
-          title: Image.asset("assets/images/logo.png" , height: 70,)
+          title: Image.asset("assets/images/logo.png" , height: 40,)
         ),
         backgroundColor: Colors.white,
         body: Column(

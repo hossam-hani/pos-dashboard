@@ -28,10 +28,12 @@ class User {
   String name;
   String email;
   String phone;
-  int isBlocked;
+  bool isBlocked;
   int shopId;
   String updatedAt;
   String createdAt;
+  String role;
+
   int id;
 
   User(
@@ -42,17 +44,19 @@ class User {
       this.shopId,
       this.updatedAt,
       this.createdAt,
-      this.id});
+      this.id,
+      this.role});
 
   User.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     email = json['email'];
     phone = json['phone'];
-    isBlocked = json['is_blocked'];
+    isBlocked = json['is_blocked'] == "1" ? true : false;
     shopId = json['shop_id'];
     updatedAt = json['updated_at'];
     createdAt = json['created_at'];
     id = json['id'];
+    role = json['role'];
   }
 
   Map<String, dynamic> toJson() {
@@ -60,11 +64,12 @@ class User {
     data['name'] = this.name;
     data['email'] = this.email;
     data['phone'] = this.phone;
-    data['is_blocked'] = this.isBlocked;
+    data['is_blocked'] = this.isBlocked ? "1" : "0";
     data['shop_id'] = this.shopId;
     data['updated_at'] = this.updatedAt;
     data['created_at'] = this.createdAt;
     data['id'] = this.id;
+    data['role'] = this.role;
     return data;
   }
 }

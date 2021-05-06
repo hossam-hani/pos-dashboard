@@ -140,7 +140,7 @@ class _TransactionsListState extends State<TransactionsList> {
             },
             child: Center(child: FaIcon(FontAwesomeIcons.times,color:Colors.black),),
             ),
-          title: Image.asset("assets/images/logo.png" , height: 70,)
+          title: Image.asset("assets/images/logo.png" , height: 40,)
         ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),

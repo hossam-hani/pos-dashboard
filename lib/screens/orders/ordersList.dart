@@ -91,7 +91,7 @@ class _OrderListState extends State<OrderList> {
               ),
               title: Image.asset(
                 "assets/images/logo.png",
-                height: 70,
+                height: 40,
               )),
       backgroundColor: Colors.white,
       body: SafeArea(

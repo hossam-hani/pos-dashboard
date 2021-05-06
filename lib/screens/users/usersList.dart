@@ -1,6 +1,8 @@
+import 'package:eckit/models/account.dart';
 import 'package:eckit/models/category.dart';
 import 'package:eckit/models/store.dart';
 import 'package:eckit/models/supplier.dart';
+import 'package:eckit/services/account_service.dart';
 import 'package:eckit/services/stores_service.dart';
 import 'package:eckit/services/suppliers_service.dart';
 import '../../services/regions_service.dart';
@@ -14,20 +16,20 @@ import '../../const.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../models/region.dart';
 
-class SuppliersList extends StatefulWidget {
+class UsersList extends StatefulWidget {
 
   dynamic changePageHandler;
   dynamic changeCurrentIndex;
 
-  SuppliersList({this.changePageHandler,this.changeCurrentIndex});
+  UsersList({this.changePageHandler,this.changeCurrentIndex});
 
   @override
-  _SuppliersListState createState() => _SuppliersListState();
+  _UsersListState createState() => _UsersListState();
 }
 
-class _SuppliersListState extends State<SuppliersList> {
+class _UsersListState extends State<UsersList> {
 
-  List<Supplier> suppliers = [];
+  List<User> users = [];
   int currentPage = 1;
   bool isLoading = false;
   
@@ -43,11 +45,12 @@ class _SuppliersListState extends State<SuppliersList> {
         ],),
       );
 
-  Future<List<Supplier>> getStoresLocal() async {
-
-    List<Supplier> temp = await SuppliersServices.getSuppliers(currentPage.toString());
+  Future<List<User>> getStoresLocal() async {
+    
+    List<User> temp = await AccountService.getUsers(currentPage.toString());
+    
     setState(() {
-      suppliers = suppliers.isEmpty ? temp : suppliers;
+      users = users.isEmpty ? temp : users;
       currentPage = currentPage+1;
       isLoading = false;
     });
@@ -89,26 +92,25 @@ class _SuppliersListState extends State<SuppliersList> {
                 Row(children: [
                   FaIcon(FontAwesomeIcons.users),
                   SizedBox(width: 10,),
-                  Text("suppliers".tr(),style: TextStyle(fontSize: 20),)
+                  Text("users".tr(),style: TextStyle(fontSize: 20),)
                 ],),
                 SizedBox(height: 15,),
 
                 Row(children: [   
-                CustomeButton(title: "add_supplier",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/supplier_editor'),),
+                CustomeButton(title: "add_users",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/users_editor'),),
                 ],),
 
-                suppliers.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),
-                suppliers.isEmpty && !isLoading ? SizedBox() : Expanded(
+                users.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),
+                users.isEmpty && !isLoading ? SizedBox() : Expanded(
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                           child: Pagination(
                           progress: loadingKit,
                           pageBuilder: (currentListSize) => getStoresLocal(),
-                          itemBuilder: (index, Supplier supplier) => ListItem(
-                            title: supplier.name.toString(),
-                            id: supplier.id.toString(),
-                            notes : supplier.notes.toString(),
-                            supplier: supplier,),
+                          itemBuilder: (index, User user) => ListItem(
+                            title: user.name.toString(),
+                            id: user.id.toString(),
+                            user: user,),
                               ),
                         ),
                 ),
@@ -126,14 +128,14 @@ class ListItem extends StatelessWidget {
   String id;
   String image;
   String notes;
-  Supplier supplier;
+  User user;
 
 
-  ListItem({this.title,this.id,this.image,this.supplier,this.notes});
+  ListItem({this.title,this.id,this.image,this.user,this.notes});
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () => Navigator.pushNamed(context, '/supplier_editor',arguments: supplier),
+        onTap: () => Navigator.pushNamed(context, '/users_editor',arguments: user),
         child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -162,15 +164,15 @@ class ListItem extends StatelessWidget {
         textAlign: TextAlign.left,
       ),
 
-              Text(
-        '$notes',
-        style: TextStyle(
-            fontSize: 12,
-          color: const Color(0xff909090),
-          fontWeight: FontWeight.w100,
-        ),
-        textAlign: TextAlign.start,
-      ),
+      //         Text(
+      //   '$notes',
+      //   style: TextStyle(
+      //       fontSize: 12,
+      //     color: const Color(0xff909090),
+      //     fontWeight: FontWeight.w100,
+      //   ),
+      //   textAlign: TextAlign.start,
+      // ),
 
             ],)
           ],),

@@ -27,7 +27,7 @@ class AddressesList extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-          title: Image.asset("assets/images/logo.png" , height: 70,)
+          title: Image.asset("assets/images/logo.png" , height: 40,)
         ),
         backgroundColor: Colors.white,
         body: Column(

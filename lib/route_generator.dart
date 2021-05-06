@@ -2,11 +2,14 @@
 import 'package:eckit/screens/create_account.dart';
 import 'package:eckit/screens/home.dart';
 import 'package:eckit/screens/intro.dart';
+import 'package:eckit/screens/notificationsList.dart';
 import 'package:eckit/screens/products/productEditor.dart';
 import 'package:eckit/screens/products/productList.dart';
 import 'package:eckit/screens/stock/stockEditor.dart';
 import 'package:eckit/screens/suppliers/suppliersList.dart';
 import 'package:eckit/screens/transactions/transactionsList.dart';
+import 'package:eckit/screens/users/usersEditor.dart';
+import 'package:eckit/screens/users/usersList.dart';
 import 'package:flutter/material.dart';
 import 'screens/account_details.dart';
 import 'screens/categories/categoryEditor.dart';
@@ -94,8 +97,14 @@ class RouteGenerator {
         recipientType:  args == null? null : !(args as Map).containsKey("recipientType") ? null : (args as Map)["recipientType"],));    
      case '/transactions_editor' :
         return MaterialPageRoute(builder: (_) => TranscationEditor(transaction: args,)); 
+      case '/users' :
+        return MaterialPageRoute(builder: (_) => UsersList()); 
+      case '/users_editor' :
+        return MaterialPageRoute(builder: (_) => UsersEditor(user: args,));  
+      case '/notifications' :
+        return MaterialPageRoute(builder: (_) => NotificationsList());  
 
-              
+                
     }
     
   

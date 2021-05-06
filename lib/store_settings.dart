@@ -29,6 +29,7 @@ class _StoreSettingsState extends State<StoreSettings> {
 
   bool isLoading = false;
   String sales;
+  String expenses;
   String ordersNumbers;
   String customers;
   String currency;
@@ -54,6 +55,7 @@ class _StoreSettingsState extends State<StoreSettings> {
 
       setState(() {
         sales = response.data["sales"].toString();
+        expenses = response.data["expenses"].toString();        
         customers = response.data["customerNo"].toString();
         ordersNumbers = response.data["orderNo"].toString();
         currency = response.data["currency"].toString();
@@ -84,113 +86,118 @@ class _StoreSettingsState extends State<StoreSettings> {
       
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+    return SingleChildScrollView (
+          child: Column(children: [
 
-      SizedBox(height: 10,),
+        SizedBox(height: 10,),
 
-      Row(children: [
-        FaIcon(FontAwesomeIcons.store),
-        SizedBox(width: 10,),
-        Text("store".tr(),style: TextStyle(fontSize: 20),)
-      ],),
-
-      SizedBox(height: 10,),
-
-
-
-      CustomeButton(title: "edit_store_settings".tr(),handler: () => {
-        Navigator.pushNamed(context, '/edit_shop_details')
-      },),
-
-
-      CustomeButton(
-        title: "logout".tr(),handler: () async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.remove("account");
-        Navigator.pushNamed(context, '/login');
-      },),
-
-
-      Divider(),
-
-      Row(children: [
-
-      Expanded(
-        child: FlatButton(
-        onPressed: () {
-              DatePicker.showDatePicker(context,showTitleActions: true,minTime: DateTime(2021, 1, 1),
-              maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                setState(() {
-                  startFrom = date;
-                });
-              }, onConfirm: (date) {
-                setState(() {
-                  startFrom = date;
-                });
-                }, 
-              currentTime: startFrom,
-              locale: LocaleType.ar);
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          Text(
-              'startFrom'.tr(),
-              style: TextStyle(color: Colors.blue),
-        ),
-        Text(
-              startFrom.toString(),
-              style: TextStyle(color: Colors.grey,fontFamily: "Lato",fontSize: 12),
-        )
-        ],)),
-        ),
-
-      Expanded(
-        child: FlatButton(
-        onPressed: () {
-              DatePicker.showDatePicker(context,showTitleActions: true,minTime: DateTime(2021, 1, 1),
-              maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                setState(() {
-                  endAt = date;
-                });
-              }, onConfirm: (date) {
-                setState(() {
-                  endAt = date;
-                });
-                }, 
-              currentTime: endAt,
-              locale: LocaleType.ar);
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          Text(
-              'endAt'.tr(),
-              style: TextStyle(color: Colors.blue),
-        ),
-        Text(
-              endAt.toString(),
-              style: TextStyle(color: Colors.grey,fontFamily: "Lato",fontSize: 12),
-        )
-        ],)),
-        ),
-
-      ],),
-
-      SizedBox(height: 10,),
-
-      CustomeButton(title: "confirm".tr(),handler: search,),
-
-      isLoading ? loadingKit : sales == null ? SizedBox() : Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(children: [
-          DataItem(lable: "المبيعات", contenct: "$sales $currency", icon: FaIcon(FontAwesomeIcons.dollarSign,color: Colors.white,),),
-          DataItem(lable: "عدد الطلبات", contenct: "$ordersNumbers", icon: FaIcon(FontAwesomeIcons.cartArrowDown,color: Colors.white,),),
-          DataItem(lable: "عدد العملاء", contenct: "$customers", icon: FaIcon(FontAwesomeIcons.users,color: Colors.white,),),
+        Row(children: [
+          FaIcon(FontAwesomeIcons.store),
+          SizedBox(width: 10,),
+          Text("store".tr(),style: TextStyle(fontSize: 20),)
         ],),
-      ),
 
-    ],);
+        SizedBox(height: 10,),
+
+
+
+        CustomeButton(title: "edit_store_settings".tr(),handler: () => {
+          Navigator.pushNamed(context, '/edit_shop_details')
+        },),
+
+
+        CustomeButton(
+          title: "logout".tr(),handler: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.remove("account");
+          Navigator.pushNamed(context, '/login');
+        },),
+
+
+        Divider(),
+
+        Row(children: [
+
+        Expanded(
+          child: FlatButton(
+          onPressed: () {
+                DatePicker.showDatePicker(context,showTitleActions: true,minTime: DateTime(2021, 1, 1),
+                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
+                  setState(() {
+                    startFrom = date;
+                  });
+                }, onConfirm: (date) {
+                  setState(() {
+                    startFrom = date;
+                  });
+                  }, 
+                currentTime: startFrom,
+                locale: LocaleType.ar);
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            Text(
+                'startFrom'.tr(),
+                style: TextStyle(color: Colors.blue),
+          ),
+          Text(
+                startFrom.toString(),
+                style: TextStyle(color: Colors.grey,fontFamily: "Lato",fontSize: 12),
+          )
+          ],)),
+          ),
+
+        Expanded(
+          child: FlatButton(
+          onPressed: () {
+                DatePicker.showDatePicker(context,showTitleActions: true,minTime: DateTime(2021, 1, 1),
+                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
+                  setState(() {
+                    endAt = date;
+                  });
+                }, onConfirm: (date) {
+                  setState(() {
+                    endAt = date;
+                  });
+                  }, 
+                currentTime: endAt,
+                locale: LocaleType.ar);
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            Text(
+                'endAt'.tr(),
+                style: TextStyle(color: Colors.blue),
+          ),
+          Text(
+                endAt.toString(),
+                style: TextStyle(color: Colors.grey,fontFamily: "Lato",fontSize: 12),
+          )
+          ],)),
+          ),
+
+        ],),
+
+        SizedBox(height: 10,),
+
+        CustomeButton(title: "confirm".tr(),handler: search,),
+
+        isLoading ? loadingKit : sales == null ? SizedBox() : Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(children: [
+            DataItem(lable: "المبيعات", contenct: "$sales $currency", icon: FaIcon(FontAwesomeIcons.dollarSign,color: Colors.white,),),
+            DataItem(lable: "المصاريف", contenct: "$expenses $currency", icon: FaIcon(FontAwesomeIcons.dollarSign,color: Colors.white,),),
+            DataItem(lable: "الصافي", contenct: "${double.parse(sales) - double.parse(expenses)} $currency", icon: FaIcon(FontAwesomeIcons.dollarSign,color: Colors.white,),),
+
+            DataItem(lable: "عدد الطلبات", contenct: "$ordersNumbers", icon: FaIcon(FontAwesomeIcons.cartArrowDown,color: Colors.white,),),
+            DataItem(lable: "عدد العملاء", contenct: "$customers", icon: FaIcon(FontAwesomeIcons.users,color: Colors.white,),),
+          ],),
+        ),
+
+      ],),
+    );
   }
 }
 
@@ -227,7 +234,7 @@ class DataItem extends StatelessWidget {
     height: 51.0,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(10.0),
-      color: const Color(0xffff7700),
+      color: const Color(0xff1e272e),
     ),
     child: Center(
       child: Row(

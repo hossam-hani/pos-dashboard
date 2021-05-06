@@ -36,7 +36,7 @@ class CustomeButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.0),
-          color:  Color( mainColor ? 0xffff7700 : 0xff000000),
+          color:  Color( mainColor ? 0xff1e272e : 0xff000000),
         ),
         ),
       ),

@@ -29,19 +29,19 @@ class _DrawerContentState extends State<DrawerContent> {
         ),
 
         
-        InkWell(
-            onTap: (){
-              Navigator.pushNamed(context, '/points_editor');
-            },
-            child: ListTile(
-            title: Text('points'.tr()),
-            subtitle: Text(
-              'points_des'.tr()
-            ),
-            leading: FaIcon(FontAwesomeIcons.coins),
-            isThreeLine: true,
-          ),
-        ),
+        // InkWell(
+        //     onTap: (){
+        //       Navigator.pushNamed(context, '/points_editor');
+        //     },
+        //     child: ListTile(
+        //     title: Text('points'.tr()),
+        //     subtitle: Text(
+        //       'points_des'.tr()
+        //     ),
+        //     leading: FaIcon(FontAwesomeIcons.coins),
+        //     isThreeLine: true,
+        //   ),
+        // ),
 
 
         InkWell(
@@ -96,6 +96,21 @@ class _DrawerContentState extends State<DrawerContent> {
             title: Text('stocks'.tr()),
             subtitle: Text(
               'stocks_des'.tr()
+            ),
+            leading: FaIcon(FontAwesomeIcons.boxes),
+            isThreeLine: true,
+          ),
+        ),
+
+
+        InkWell(
+            onTap: (){
+              Navigator.pushNamed(context, '/users');
+            },
+            child: ListTile(
+            title: Text('users'.tr()),
+            subtitle: Text(
+              'users_des'.tr()
             ),
             leading: FaIcon(FontAwesomeIcons.boxes),
             isThreeLine: true,

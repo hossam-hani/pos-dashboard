@@ -1,33 +1,32 @@
-import 'package:eckit/models/category.dart';
-import 'package:eckit/models/store.dart';
-import 'package:eckit/models/supplier.dart';
-import 'package:eckit/services/stores_service.dart';
-import 'package:eckit/services/suppliers_service.dart';
-import '../../services/regions_service.dart';
+import 'package:eckit/models/Notification.dart';
+import 'package:eckit/models/account.dart';
+
+import 'package:eckit/services/account_service.dart';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../components/customeButton.dart';
+import '../components/customeButton.dart';
 import 'package:paging/paging.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../const.dart';
+import '../const.dart';
 import 'package:easy_localization/easy_localization.dart';
-import '../../models/region.dart';
 
-class SuppliersList extends StatefulWidget {
+
+class NotificationsList extends StatefulWidget {
 
   dynamic changePageHandler;
   dynamic changeCurrentIndex;
 
-  SuppliersList({this.changePageHandler,this.changeCurrentIndex});
+  NotificationsList({this.changePageHandler,this.changeCurrentIndex});
 
   @override
-  _SuppliersListState createState() => _SuppliersListState();
+  _NotificationsListState createState() => _NotificationsListState();
 }
 
-class _SuppliersListState extends State<SuppliersList> {
+class _NotificationsListState extends State<NotificationsList> {
 
-  List<Supplier> suppliers = [];
+  List<NotificationModel> notifications = [];
   int currentPage = 1;
   bool isLoading = false;
   
@@ -43,11 +42,12 @@ class _SuppliersListState extends State<SuppliersList> {
         ],),
       );
 
-  Future<List<Supplier>> getStoresLocal() async {
-
-    List<Supplier> temp = await SuppliersServices.getSuppliers(currentPage.toString());
+  Future<List<NotificationModel>> getStoresLocal() async {
+    
+    List<NotificationModel> temp = await AccountService.getNotifications(currentPage.toString());
+    
     setState(() {
-      suppliers = suppliers.isEmpty ? temp : suppliers;
+      notifications = notifications.isEmpty ? temp : notifications;
       currentPage = currentPage+1;
       isLoading = false;
     });
@@ -87,28 +87,26 @@ class _SuppliersListState extends State<SuppliersList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                 Row(children: [
-                  FaIcon(FontAwesomeIcons.users),
+                  FaIcon(FontAwesomeIcons.solidBell),
                   SizedBox(width: 10,),
-                  Text("suppliers".tr(),style: TextStyle(fontSize: 20),)
+                  Text("notifcations".tr(),style: TextStyle(fontSize: 20),)
                 ],),
                 SizedBox(height: 15,),
 
-                Row(children: [   
-                CustomeButton(title: "add_supplier",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/supplier_editor'),),
-                ],),
-
-                suppliers.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),
-                suppliers.isEmpty && !isLoading ? SizedBox() : Expanded(
+            
+                notifications.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),
+                notifications.isEmpty && !isLoading ? SizedBox() : Expanded(
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                           child: Pagination(
                           progress: loadingKit,
                           pageBuilder: (currentListSize) => getStoresLocal(),
-                          itemBuilder: (index, Supplier supplier) => ListItem(
-                            title: supplier.name.toString(),
-                            id: supplier.id.toString(),
-                            notes : supplier.notes.toString(),
-                            supplier: supplier,),
+                          itemBuilder: (index, NotificationModel notification) => ListItem(
+                            title: notification.subject.toString(),
+                            message: notification.message.toString(),
+                            image: notification.img.toString(),
+                            id: notification.id.toString(),
+                            ),
                               ),
                         ),
                 ),
@@ -125,58 +123,57 @@ class ListItem extends StatelessWidget {
   String title;
   String id;
   String image;
+  String message;
   String notes;
-  Supplier supplier;
 
 
-  ListItem({this.title,this.id,this.image,this.supplier,this.notes});
+  ListItem({this.title,this.id,this.image,this.notes,this.message});
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-        onTap: () => Navigator.pushNamed(context, '/supplier_editor',arguments: supplier),
-        child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
+    return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      
+      Row(children: [
+          image == null ? FaIcon(FontAwesomeIcons.box,size: 55,color: const Color(0xffe6d7d7),) :CachedNetworkImage(
+              height: 50,
+              width: 50,
+              imageUrl: image,
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+          ),
 
        SizedBox(width: 25,),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                    Text(
-        '#$id',
+        Expanded(
+                  child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+    Text(
+    '$title',
+    style: TextStyle(
+          fontSize: 20,
+      color: const Color(0xff3a3a3a),
+      fontWeight: FontWeight.w300,
+    ),
+    textAlign: TextAlign.start,
+      ),
+
+      Text(
+          '$message',
           style: TextStyle(
-            fontSize: 15,
-            color: const Color(0xffe6d7d7),
+              fontSize: 15,
+            color: const Color(0xff909090),
+            fontWeight: FontWeight.w100,
           ),
-          textAlign: TextAlign.left,
-        ),
-
-        Text(
-        '$title',
-        style: TextStyle(
-            fontSize: 15,
-          color: const Color(0xff3a3a3a),
-          fontWeight: FontWeight.w300,
-        ),
-        textAlign: TextAlign.left,
+          textAlign: TextAlign.start,
       ),
 
-              Text(
-        '$notes',
-        style: TextStyle(
-            fontSize: 12,
-          color: const Color(0xff909090),
-          fontWeight: FontWeight.w100,
-        ),
-        textAlign: TextAlign.start,
-      ),
-
-            ],)
           ],),
-        Divider()
+        )
       ],),
-    );
+    Divider()
+      ],);
   }
 }
 
