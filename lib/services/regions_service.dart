@@ -76,7 +76,14 @@ class RegionsServices{
         } : {
           "name" : name,
           "is_active" : isActive,
-        });
+        },  options: Options(
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 600;
+            },
+        ));
+
+        print(response.data);
 
         Region temp;
         temp = Region.fromJson(response.data);
