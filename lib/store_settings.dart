@@ -1,16 +1,22 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:eckit/components/customeButton.dart';
 import 'package:eckit/models/account.dart';
+import 'package:eckit/services/orders_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'const.dart';
+import 'dart:ui' as ui;
+
+import 'package:intl/intl.dart';
 
 
 class StoreSettings extends StatefulWidget {
@@ -33,7 +39,10 @@ class _StoreSettingsState extends State<StoreSettings> {
   String ordersNumbers;
   String customers;
   String currency;
+  String graph = "monthSales"; // weekSales monthSales salesVsConsts
+  GraphDataForSalesAndCosts graphDataForSalesAndCosts;
 
+  
   search() async {
     setState(() {
       isLoading = true;
@@ -69,6 +78,27 @@ class _StoreSettingsState extends State<StoreSettings> {
     setState(() {
       isLoading = false;
     });
+  } 
+
+  bool isLoadingGraph = true;
+
+  getGraphData(type) async {
+    setState(() {
+      isLoadingGraph = true;
+    });
+    GraphDataForSalesAndCosts graphDataForSalesAndCostsTemp =  await OrderServices.getGraphData(type);
+    print(graphDataForSalesAndCostsTemp);
+    setState(() {
+      graphDataForSalesAndCosts = graphDataForSalesAndCostsTemp;
+      isLoadingGraph = false;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getGraphData("perweekinthismonth");
   }
 
 
@@ -83,9 +113,19 @@ class _StoreSettingsState extends State<StoreSettings> {
         Text("loading".tr())
         ],),
       );
-      
+
+
+
   @override
   Widget build(BuildContext context) {
+    List<_SalesData> data = [
+      _SalesData('Jan', 35),
+      _SalesData('Feb', 28),
+      _SalesData('Mar', 34),
+      _SalesData('Apr', 32),
+      _SalesData('May', 40)
+    ];
+
     return SingleChildScrollView (
           child: Column(children: [
 
@@ -98,6 +138,112 @@ class _StoreSettingsState extends State<StoreSettings> {
         ],),
 
         SizedBox(height: 10,),
+
+     
+
+        Row(children: [
+        
+        Expanded(
+          child: CustomeButton(
+            title: "العملاء",handler: () async {
+            Navigator.pushNamed(context, '/customers_reports');
+          },),
+        ),
+        
+        Expanded(
+          child: CustomeButton(
+                  title: "اذونات السداد",handler: () async {
+                  Navigator.pushNamed(context, '/transactions_reports',arguments: {
+                    "startAt" : null,
+                    "endAt" : null,
+                    "customerId" : null,
+                  });
+                },),
+        ),
+        
+        ],),
+
+ 
+
+        Row(children: [
+          Expanded(
+         child: CustomeButton(
+                title: "المصاريف",handler: () async {
+                Navigator.pushNamed(context, '/costs_reports',arguments: {
+                  "startAt" : null,
+                  "endAt" : null,
+                  "type" : null,
+                });
+              },),
+          ),
+
+        Expanded(
+          child: CustomeButton(
+            title: "الزيارات",handler: () async {
+            Navigator.pushNamed(context, '/vstists_reports',arguments: {
+             "startAt" : null,
+              "endAt" : null,
+              "customerId" : null,
+              "userId" : null,
+            });
+          },),
+        ),
+        ],),
+  
+        Row(children: [
+            Expanded(
+            child: CustomeButton(
+            title: "الفواتير",handler: () async {
+            Navigator.pushNamed(context, '/orders_reports',arguments: {
+              "startAt" : null,
+              "endAt" : null,
+              "customerId" : null,
+            });
+          },),
+            ),
+
+        
+        Expanded(
+          child: CustomeButton(
+            title: "المشتريات",handler: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            Navigator.pushNamed(context, '/suppliers_invoices',arguments: {
+              "startAt" : null,
+              "endAt" : null,
+              "supplierId" : null,
+            });
+          },),
+        ),
+
+        ],),
+
+        Row(children: [
+          Expanded(
+            child: CustomeButton(
+            title: "التكاليف",handler: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.remove("account");
+            Navigator.pushNamed(context, '/login');
+                  },),
+          ),
+
+        Expanded(
+          child: CustomeButton(
+            title: "الإرباح",handler: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.remove("account");
+            Navigator.pushNamed(context, '/login');
+          },),
+        ),
+        ],),
+
+
+        CustomeButton(
+          title: "الضريبة",handler: () async {
+            Navigator.pushNamed(context, '/taxes_editor');
+        },),
+
+        Divider(),
 
 
 
@@ -113,9 +259,7 @@ class _StoreSettingsState extends State<StoreSettings> {
           Navigator.pushNamed(context, '/login');
         },),
 
-
-        Divider(),
-
+        
         Row(children: [
 
         Expanded(
@@ -180,8 +324,7 @@ class _StoreSettingsState extends State<StoreSettings> {
 
         ],),
 
-        SizedBox(height: 10,),
-
+        
         CustomeButton(title: "confirm".tr(),handler: search,),
 
         isLoading ? loadingKit : sales == null ? SizedBox() : Padding(
@@ -191,10 +334,72 @@ class _StoreSettingsState extends State<StoreSettings> {
             DataItem(lable: "المصاريف", contenct: "$expenses $currency", icon: FaIcon(FontAwesomeIcons.dollarSign,color: Colors.white,),),
             DataItem(lable: "الصافي", contenct: "${double.parse(sales) - double.parse(expenses)} $currency", icon: FaIcon(FontAwesomeIcons.dollarSign,color: Colors.white,),),
 
-            DataItem(lable: "عدد الطلبات", contenct: "$ordersNumbers", icon: FaIcon(FontAwesomeIcons.cartArrowDown,color: Colors.white,),),
+            DataItem(lable: "عدد الفواتير", contenct: "$ordersNumbers", icon: FaIcon(FontAwesomeIcons.cartArrowDown,color: Colors.white,),),
             DataItem(lable: "عدد العملاء", contenct: "$customers", icon: FaIcon(FontAwesomeIcons.users,color: Colors.white,),),
           ],),
         ),
+
+
+        SizedBox(height: 10,),
+
+        Divider(),
+        Text("الرسوم البيانية للمبيعات و المصاريف"),
+
+          
+        Row(children: [
+            Expanded(
+            child: CustomeButton(
+            title: "اسبوعيا خلال الشهر",handler: () async {
+              getGraphData("perweekinthismonth");
+            },),
+            ),
+
+           Expanded(
+            child: CustomeButton(
+            title: "يوميا خلال الشهر",handler: () async {
+              getGraphData("perdayinthismonth");
+            },),
+            ),
+
+        ],),
+
+      
+
+        
+
+          // Initialize the chart widget
+        //   SfCartesianChart(
+        //       primaryXAxis: CategoryAxis(),
+        //       // Chart title
+        //       title: ChartTitle(text: 'تقرير المبيعات لاخر 6'),
+        //       // Enable legend
+        //       legend: Legend(isVisible: true),
+
+        //       // Enable tooltip
+        //       tooltipBehavior: TooltipBehavior(enable: true),
+        //       series: <ChartSeries<_SalesData, String>>[
+        //         LineSeries<_SalesData, String>(
+        //             dataSource: data,
+        //             xValueMapper: (_SalesData sales, _) => sales.year,
+        //             yValueMapper: (_SalesData sales, _) => sales.sales,
+        //             name: 'Sales',
+        //             // Enable data label
+        //             dataLabelSettings: DataLabelSettings(isVisible: true))
+        // ]),
+
+
+
+        // weekSales monthSales salesVsConsts
+
+        
+
+      isLoadingGraph && graphDataForSalesAndCosts == null ? Text("جاري التحميل") : Center(child:
+         Container(
+           width: MediaQuery. of(context). size. width,
+           child: _buildDefaultLineChart("monthSales",graphDataForSalesAndCosts)
+           )
+         ) 
+   
 
       ],),
     );
@@ -260,4 +465,89 @@ class DataItem extends StatelessWidget {
 
     ],);
   }
+}
+
+
+class _SalesData {
+  _SalesData(this.year, this.sales);
+
+  final String year;
+  final double sales;
+}
+
+
+  /// Get the cartesian chart with default line series
+  Widget _buildDefaultLineChart(String graph, GraphDataForSalesAndCosts graphDataForSalesAndCosts) {
+    return Directionality(
+      textDirection:ui.TextDirection.rtl,
+      child: SfCartesianChart(
+        plotAreaBorderWidth: 0,
+        title: ChartTitle(text: graphDataForSalesAndCosts.sales.length == 4 ? 'المبيعات الاسبوعية' : 'المبيعات الشهرية'),
+        // legend: Legend(
+        // isVisible:  true,
+        // overflowMode: LegendItemOverflowMode.wrap),
+        primaryXAxis: NumericAxis(
+            edgeLabelPlacement: EdgeLabelPlacement.shift,
+            interval: 1,
+            labelFormat:  graphDataForSalesAndCosts.sales.length == 4 ? '{value} الأسبوع' : '{value}',
+            majorGridLines: const MajorGridLines(width: 0)),
+            primaryYAxis: NumericAxis(
+            labelFormat: '{value} EGP',
+            axisLine: const AxisLine(width: 0),
+            majorTickLines: const MajorTickLines(color: Colors.transparent)),
+        series: _getDefaultLineSeries(graphDataForSalesAndCosts),
+        tooltipBehavior: TooltipBehavior(enable: true),
+      ),
+    );
+  }
+
+
+  /// The method returns line series to chart.
+  List<LineSeries<_ChartData, num>> _getDefaultLineSeries(GraphDataForSalesAndCosts graphDataForSalesAndCosts) {
+
+    List<_ChartData> chartData = <_ChartData>[];
+    if(graphDataForSalesAndCosts != null){
+    for(int i = 0; i < graphDataForSalesAndCosts.sales.length; i++){
+      chartData.add(
+        _ChartData(
+          i +1,
+          graphDataForSalesAndCosts.sales[i],
+         graphDataForSalesAndCosts.sales.length == 4 ? 0 : graphDataForSalesAndCosts.costs[i]
+          )
+      );
+    }
+
+    }
+
+  
+    return <LineSeries<_ChartData, num>>[
+      LineSeries<_ChartData, num>(
+          animationDuration: 2500,
+          dataSource: chartData,
+          xValueMapper: (_ChartData sales, _) => sales.x,
+          yValueMapper: (_ChartData sales, _) => sales.y,
+          width: 2,
+          name: 'المبيعات',
+          markerSettings: const MarkerSettings(isVisible: true)
+          ),
+
+      LineSeries<_ChartData, num>(
+          animationDuration: 2500,
+          dataSource: chartData,
+          xValueMapper: (_ChartData sales, _) => sales.x,
+          yValueMapper: (_ChartData sales, _) => sales.y2,
+          width: 2,
+          name: 'المصاريف',
+          markerSettings: const MarkerSettings(isVisible: false)
+          ),
+    ];
+  }
+
+
+
+class _ChartData {
+  _ChartData(this.x, this.y, this.y2);
+  final num  x;
+  final num  y;
+  final num  y2;
 }

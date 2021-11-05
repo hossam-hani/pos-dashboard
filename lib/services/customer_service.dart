@@ -10,6 +10,23 @@ import '../const.dart';
 
 class CustomerServices{
 
+    static Future<String> getCustomerBalance() async {
+      
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+
+        Dio dio = new Dio();
+        dio.options.headers['content-Type'] = 'application/json';
+        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+
+        Response response;
+
+        response = await dio.get("$baseUrl/customers/balance/total");
+
+        return response.data;
+
+    }
+
     static Future<List<Customer>> getCustomers(String currentPage,String keyword) async {
       
       SharedPreferences prefs = await SharedPreferences.getInstance();

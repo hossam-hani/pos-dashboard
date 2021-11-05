@@ -3,59 +3,51 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:eckit/models/category.dart';
+import 'package:eckit/models/cost.dart';
+import 'package:eckit/models/product.dart';
+import 'package:eckit/models/store.dart';
 import 'package:eckit/services/categories_service.dart';
+import 'package:eckit/services/costs_service.dart';
+import 'package:eckit/services/inventory_services.dart';
+import 'package:eckit/services/product_service.dart';
+import 'package:eckit/services/stores_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../components/customeButton.dart';
-import '../../services/points_service.dart';
+
 import '../../const.dart';
 import '../../validator.dart';
-// import 'package:majascan/majascan.dart';  
+import '../../models/region.dart';
+import '../../services/regions_service.dart';
 
-class PointsEditor extends StatefulWidget {
+// ignore: must_be_immutable
+class CostEditor extends StatefulWidget {
+
+  Cost cost;
+
+  CostEditor({this.cost});
 
   @override
-  _PointsEditorState createState() => _PointsEditorState();
+  _CostEditorState createState() => _CostEditorState();
 }
 
-class _PointsEditorState extends State<PointsEditor> {
+
+class _CostEditorState extends State<CostEditor> {
   
    final _formKey = GlobalKey<FormState>();
-   TextEditingController points = new TextEditingController();
-   TextEditingController uid = new TextEditingController();
-   bool _isCredit = true;
+   TextEditingController notes = new TextEditingController();
+   TextEditingController amount = new TextEditingController();
+   String type;
+
+
+   Product currentProduct;
+
    bool isLoading = false;
-
-//  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-//   Barcode result;
-//   QRViewController controller;
-
-//   // In order to get hot reload to work we need to pause the camera if the platform
-//   // is android, or resume the camera if the platform is iOS.
-//   @override
-//   void reassemble() {
-//     super.reassemble();
-//     if (Platform.isAndroid) {
-//       controller.pauseCamera();
-//     } else if (Platform.isIOS) {
-//       controller.resumeCamera();
-//     }
-//   }
-
-//   void _onQRViewCreated(QRViewController controller) {
-//     this.controller = controller;
-//     controller.scannedDataStream.listen((scanData) {
-//       setState(() {
-//         result = scanData;
-//       });
-//     });
-//   }
-
 
 
 
@@ -68,19 +60,47 @@ class _PointsEditorState extends State<PointsEditor> {
         ),
         ],),
       );
-      
+ 
+
+
+
+  initValues() async {
+  
+  setState(() {
+      isLoading = true;
+  });
+
+  List<Store> temp = await StoreServices.getAllStores();
+
+  setState(() {
+    isLoading = false;
+  });
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initValues();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
 
   save() async {
-
 
     setState(() {
       isLoading = true;
     });
 
     if (_formKey.currentState.validate()) {
-
-      await PointsServices.addPointsToClient(uid: uid.text,amount: points.text,type: _isCredit ? "credit" : "debit");
-
+      await CostServices.createCost(
+        amount: amount.text,
+        notes: notes.text,
+        type: type,
+        context: context
+        );
     }
 
     setState(() {
@@ -89,14 +109,6 @@ class _PointsEditorState extends State<PointsEditor> {
 
   }
 
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar:  InkWell(
         onTap: save,
@@ -132,7 +144,7 @@ class _PointsEditorState extends State<PointsEditor> {
           title: Image.asset("assets/images/logo.png" , height: 40,)
         ),
         backgroundColor: Colors.white,
-        body: SingleChildScrollView(
+        body: isLoading ? loadingKit : SingleChildScrollView(
               child: Form(
               key: _formKey,
               child: Padding(
@@ -143,8 +155,7 @@ class _PointsEditorState extends State<PointsEditor> {
 
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child:   Text(
-                    "points".tr(),
+                  child:   Text("إضافة مصروف",
                     style: TextStyle(  
                       fontSize: 20,
                       color: const Color(0xff000000),
@@ -154,72 +165,60 @@ class _PointsEditorState extends State<PointsEditor> {
                   ),
                 ),
 
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomeTextField(
+                    controller:  amount,
+                    hintTxt: "قيمة المصروف".tr(),
+                    labelTxt: "القيمة".tr(),
+                  ),
+              ),
 
-                CustomeTextField(
-                  controller:  points,
-                  validator: Validator.notEmpty,
-                  hintTxt: "amount_hint_points".tr(),
-                  labelTxt: "amount_label_points".tr(),
-                ),
-
-
-                CustomeTextField(
-                  controller:  uid,
-                  validator: Validator.notEmpty,
-                  hintTxt: "uid_hint_points".tr(),
-                  labelTxt: "uid_label_points".tr(),
-                ),
-
-                SizedBox(height: 10,),
-
-              //   CustomeButton(title: "scan_client_code",icon: FontAwesomeIcons.qrcode,handler: () async {
-              //                 String qrResult = await MajaScan.startScan(
-              //             title: "قم بتصوير كود العميل", 
-              //             barColor: Colors.black, 
-              //             titleColor: Colors.white, 
-              //             qRCornerColor: Colors.yellow,
-              //             qRScannerColor: Colors.yellow,
-              //             flashlightEnable: true, 
-              //             scanAreaScale: 0.8 /// value 0.0 to 1.0
-              //         );
-
-              //         setState(() {
-              //           uid.text = qrResult;
-              //         });
-              // },),
-
-
-
-           
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomeTextField(
+                    controller:  notes,
+                    hintTxt: "ادخل البيان".tr(),
+                    labelTxt: "البيان".tr(),
+                  ),
+              ),
 
 
 
               SizedBox(height: 20,),
 
-                Row(children: [
-    
-                CupertinoSwitch(
-                  value: _isCredit,
-                  onChanged: (value) {
-                    setState(() {
-                      _isCredit = value;
-                    });
-                  },
+              ListTile(
+                leading: Text("نوع المصروف"),
+                title: DropdownButton<String>(
+                        value: type,
+                        isExpanded: true,
+                        hint: Text("اختر نوع المصروف"),
+                        icon: const Icon(Icons.arrow_downward),
+                        iconSize: 24,
+                        elevation: 16,
+                        style: const TextStyle(color: Colors.deepPurple),
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            type = newValue;
+                          });
+                        },
+                        items: <String>['expenses', 'losses', 'salaries']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value == "expenses" ? "مصاريف" : value == "losses" ? "هوالك"  : "مرتبات"),
+                          );
+                        }).toList(),
+                      ),
                 ),
 
-                SizedBox(width: 15,),
 
-                Text(_isCredit ? "credit".tr() : "debit".tr())
 
-                ],),
-
-                SizedBox(height: 20,),
-
-          //       Expanded(child: QRView(
-          //     key: qrKey,
-          //     onQRViewCreated: _onQRViewCreated,
-          //   ),
-          // )
+               SizedBox(height: 20,),
                 
               ],),
             ),

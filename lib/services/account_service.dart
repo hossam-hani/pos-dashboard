@@ -89,8 +89,11 @@ class AccountService{
 
 
 
-    static Future<User> saveUser({String name,String email,String password,String phone,String role
-    , bool isBlocked, String id}) async {
+    static Future<User> saveUser({
+      String name,String email,String password,
+      String phone,String role,bool isBlocked,
+      String id, String inventoryId,
+      bool tax1,bool tax2,bool tax3}) async {
       
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
@@ -106,14 +109,29 @@ class AccountService{
           "email" : email,
           "password" : password,
           "phone" : phone,
-          "role" : role
+          "role" : role,
+          "inventory_id" : inventoryId,
+          "tax1" : tax1 ? 1 : 0,
+          "tax2" : tax2 ? 1 : 0,
+          "tax3" : tax3 ? 1 : 0,
         } : {
           "name" : name,
           "email" : email,
           "phone" : phone,
           "role" : role,
-          "is_blocked" : isBlocked ? "1": "0",          
-        });
+          "is_blocked" : isBlocked ? "1": "0",  
+          "inventory_id" : inventoryId,
+          "tax1" : tax1 ? 1 : 0,
+          "tax2" : tax2 ? 1 : 0,
+          "tax3" : tax3 ? 1 : 0,        
+        },  options: Options(
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 600;
+            },
+        ),);
+
+        print(response);
 
         User temp;
         temp = User.fromJson(response.data);

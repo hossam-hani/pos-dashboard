@@ -8,7 +8,7 @@
 
 
    <application
-        android:label="Cashierk (Dashboard)"
+        android:label="Safwa (Dashboard)"
         android:icon="@mipmap/launcher_icon">
         <activity android:name="com.djgeo.majascan.g_scanner.QrCodeScannerActivity"/>
         <activity

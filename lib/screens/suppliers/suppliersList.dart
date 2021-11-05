@@ -95,6 +95,7 @@ class _SuppliersListState extends State<SuppliersList> {
 
                 Row(children: [   
                 CustomeButton(title: "add_supplier",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/supplier_editor'),),
+                CustomeButton(title: "إضافة فاتورة لمورد ",icon: FontAwesomeIcons.fileInvoiceDollar,handler: () => Navigator.pushNamed(context, '/supplier_invoice_editor'),),
                 ],),
 
                 suppliers.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),

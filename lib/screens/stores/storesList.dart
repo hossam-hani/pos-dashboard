@@ -92,7 +92,13 @@ class _StoresListState extends State<StoresList> {
                 SizedBox(height: 15,),
 
                 Row(children: [   
-                CustomeButton(title: "add_store",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/store_editor'),),
+                  Expanded(child: CustomeButton(title: "add_store",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/store_editor'),)),
+                ],),
+
+
+                Row(children: [   
+                  Expanded(child: CustomeButton(title: "إنشاء حركة مخزون",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/inventory_transactions_editor'),)),
+                  Expanded(child: CustomeButton(title: "حركة المخزون",icon: FontAwesomeIcons.truckLoading,handler: () => Navigator.pushNamed(context, '/inventory_transactions'),)),
                 ],),
 
                 stores.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),
@@ -149,16 +155,36 @@ class ListItem extends StatelessWidget {
         ),
         Text(
         '$title',
-        style: TextStyle(
-            fontSize: 15,
-          color: const Color(0xff3a3a3a),
-          fontWeight: FontWeight.w300,
+          style: TextStyle(
+              fontSize: 15,
+            color: const Color(0xff3a3a3a),
+            fontWeight: FontWeight.w300,
+          ),
+          textAlign: TextAlign.left,
         ),
-        textAlign: TextAlign.left,
-      ),
+
+ 
+
 
             ],)
           ],),
+
+          SizedBox(height: 20,),   
+
+            Container(
+              width: MediaQuery. of(context). size. width - 26,
+              child: Row(
+                children: [
+                
+                  Expanded(child: CustomeButton(title: "محتويات المخزن".tr()
+                  ,icon: null
+                  ,handler: () {
+                    Navigator.pushNamed(context, '/inventory_content',arguments: id);
+                  },)),
+
+              ],),
+            ),
+
         Divider()
       ],),
     );

@@ -63,7 +63,7 @@ class _BottomBarState extends State<BottomBar> {
           ),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.cartArrowDown),
-            label: 'الطلبات',
+            label: 'الفواتير',
           ),
 
           BottomNavigationBarItem(

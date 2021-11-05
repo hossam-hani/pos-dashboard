@@ -11,6 +11,7 @@ import 'package:eckit/services/account_service.dart';
 import 'package:eckit/services/categories_service.dart';
 import 'package:eckit/services/stores_service.dart';
 import 'package:eckit/services/suppliers_service.dart';
+import 'package:eckit/services/taxes_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -43,9 +44,13 @@ class _UsersEditorState extends State<UsersEditor> {
    TextEditingController phone = new TextEditingController();
    String currentRole;
    bool _isBlocked = false;
-
-
+   bool _tax1 = false;
+   bool _tax2 = false;
+   bool _tax3 = false;
    bool isLoading = false;
+   Store fromStore;
+   List<Store> stores;
+   Taxes taxes;
 
 
 
@@ -76,7 +81,11 @@ class _UsersEditorState extends State<UsersEditor> {
         phone: phone.text,
         role: currentRole,
         isBlocked: _isBlocked,
-        id:widget.user == null ? null : widget.user.id.toString()
+        id:widget.user == null ? null : widget.user.id.toString(),
+        inventoryId: fromStore != null ? fromStore.id.toString() : null,
+        tax1: _tax1,
+        tax2: _tax2,
+        tax3: _tax3,
         );
 
     }
@@ -94,6 +103,10 @@ class _UsersEditorState extends State<UsersEditor> {
   });
 
 
+  List<Store> temp = await StoreServices.getAllStores();
+  Taxes taxesT = await TaxesService.getTaxes();
+
+
   if(widget.user != null){
 
     setState(() {
@@ -106,6 +119,8 @@ class _UsersEditorState extends State<UsersEditor> {
   }
 
     setState(() {
+      stores = temp;
+      taxes = taxesT;
       isLoading = false;
   });
 
@@ -240,6 +255,115 @@ class _UsersEditorState extends State<UsersEditor> {
                 Text(_isBlocked ? "blockead".tr() : "active".tr())
 
                 ],),
+
+           
+                SizedBox(height: 15,),
+
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child:   Text(
+                    "المخزن",
+                    style: TextStyle(  
+                      fontSize: 20,
+                      color: const Color(0xff000000),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,  
+                  ),
+                ),
+
+
+                SizedBox(height: 15,),
+
+                          ListTile(
+                leading: Text("من مخزن"),
+                title: DropdownButton<Store>(
+                        value: fromStore,
+                        isExpanded: true,
+                        hint: Text("اختر المخزن الذي سيتم الاختصام منه او الإضافة إليه"),
+                        icon: const Icon(Icons.arrow_downward),
+                        iconSize: 24,
+                        elevation: 16,
+                        style: const TextStyle(color: Colors.deepPurple),
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        onChanged: (Store newValue) {
+                          setState(() {
+                            fromStore = newValue;
+                          });
+                        },
+                        items: stores
+                            .map<DropdownMenuItem<Store>>((Store store) {
+                          return DropdownMenuItem<Store>(
+                            value: store,
+                            child: Text(store.name.toString()),
+                          );
+                        }).toList(),
+                      ),
+                ),
+
+                Divider(),
+                SizedBox(height: 15,),
+
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child:   Text(
+                    "الضرائب",
+                    style: TextStyle(  
+                      fontSize: 20,
+                      color: const Color(0xff000000),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,  
+                  ),
+                ),
+
+                SizedBox(height: 15,),
+                
+                Row(children: [
+                CupertinoSwitch(
+                  value: _tax1,
+                  onChanged: (value) {
+                    setState(() {
+                      _tax1 = value;
+                    });
+                  },
+                ),
+                SizedBox(width: 15,),
+                Text(!_tax1 ? "ضريبة [ ${taxes.tax1Title} ${taxes.tax1Amount} ] غير مفعلة" : "ضريبة [ ${taxes.tax1Title} ${taxes.tax1Amount} ] مفعلة")
+                ],),
+
+                SizedBox(height: 15,),
+                
+                Row(children: [
+                CupertinoSwitch(
+                  value: _tax2,
+                  onChanged: (value) {
+                    setState(() {
+                      _tax2 = value;
+                    });
+                  },
+                ),
+                SizedBox(width: 15,),
+                Text(!_tax2 ? "ضريبة [ ${taxes.tax2Title} ${taxes.tax2Amount} ] غير مفعلة" : "ضريبة [ ${taxes.tax2Title} ${taxes.tax2Amount} ] مفعلة")
+                ],),
+                SizedBox(height: 15,),
+                
+                Row(children: [
+                CupertinoSwitch(
+                  value: _tax3,
+                  onChanged: (value) {
+                    setState(() {
+                      _tax3 = value;
+                    });
+                  },
+                ),
+                SizedBox(width: 15,),
+                Text(!_tax3 ? "ضريبة [ ${taxes.tax3Title} ${taxes.tax3Amount} ] غير مفعلة" : "ضريبة [ ${taxes.tax3Title} ${taxes.tax3Amount} ] مفعلة")
+                ],),
+              SizedBox(height: 20,),
   
                 
               ],),
