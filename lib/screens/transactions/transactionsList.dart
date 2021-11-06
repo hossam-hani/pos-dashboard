@@ -20,9 +20,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../const.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../models/region.dart';
+import 'TransactionEditor.dart';
 
 class TransactionsList extends StatefulWidget {
-
   dynamic changePageHandler;
   dynamic changeCurrentIndex;
   String startAt;
@@ -30,12 +30,13 @@ class TransactionsList extends StatefulWidget {
   String recipientType;
   String recipientId;
 
-
-  TransactionsList({
-    this.changePageHandler,this.changeCurrentIndex,
-    this.recipientType,this.recipientId,
-    this.endAt,this.startAt
-    });
+  TransactionsList(
+      {this.changePageHandler,
+      this.changeCurrentIndex,
+      this.recipientType,
+      this.recipientId,
+      this.endAt,
+      this.startAt});
 
   @override
   _TransactionsListState createState() => _TransactionsListState();
@@ -51,68 +52,67 @@ class _TransactionsListState extends State<TransactionsList> {
   List<Supplier> suppliers;
   Customer currentCustomer;
   Supplier currentSupplier;
-  
+
   List<Transaction> transactions = [];
   int currentPage = 1;
   bool isLoading = false;
-  
+
   var loadingKit = Center(
-        child: Column(children: [
-          SizedBox(height: 20,),
-          SpinKitSquareCircle(
+    child: Column(
+      children: [
+        SizedBox(
+          height: 20,
+        ),
+        SpinKitSquareCircle(
           color: mainColor,
           size: 50.0,
         ),
-        SizedBox(height: 10,),
+        SizedBox(
+          height: 10,
+        ),
         Text("loading".tr())
-        ],),
-      );
+      ],
+    ),
+  );
 
-
-  toggleFilter(){
+  toggleFilter() {
     setState(() {
       _openFilter = !_openFilter;
     });
   }
 
-  search(){
-
+  search() {
     print(startFrom);
     print(endAt);
     print(_isCustomer ? "customer" : "supplier");
     print(_isCustomer ? currentCustomer.id : currentSupplier.id);
 
-    Navigator.pushNamed(context, '/transactions',arguments: {
-      "startAt" : startFrom,
-      "endAt" : endAt,
-      "recipientId" : _isCustomer ? currentCustomer.id : currentSupplier.id,
-      "recipientType" :_isCustomer ? "customer" : "supplier",
+    Navigator.pushNamed(context, '/transactions', arguments: {
+      "startAt": startFrom,
+      "endAt": endAt,
+      "recipientId": _isCustomer ? currentCustomer.id : currentSupplier.id,
+      "recipientType": _isCustomer ? "customer" : "supplier",
     });
-
-
   }
 
   Future<List<Transaction>> getStocksLocal() async {
-
     List<Transaction> temp = await TransactionsServices.getTransactions(currentPage.toString());
 
     setState(() {
       transactions = transactions.isEmpty ? temp : transactions;
-      currentPage = currentPage+1;
+      currentPage = currentPage + 1;
       isLoading = false;
     });
 
     return temp;
   }
 
-  getListOfSuppliers() async{
-    
-  List<Supplier> tempSuppliers = await SuppliersServices.getAllSuppliers();
+  getListOfSuppliers() async {
+    List<Supplier> tempSuppliers = await SuppliersServices.getAllSuppliers();
 
-  setState(() {
-    suppliers = tempSuppliers;  
-  });
-
+    setState(() {
+      suppliers = tempSuppliers;
+    });
   }
 
   @override
@@ -121,7 +121,19 @@ class _TransactionsListState extends State<TransactionsList> {
     getListOfSuppliers();
     print(widget.recipientId);
     setState(() {
-      isLoading =  true;
+      isLoading = true;
+    });
+  }
+
+  Future<void> _reloadData() async {
+    setState(() {
+      transactions.clear();
+      currentPage = 1;
+      isLoading = false;
+    });
+    await Future.delayed(Duration(milliseconds: 100));
+    setState(() {
+      isLoading = true;
     });
   }
 
@@ -135,193 +147,240 @@ class _TransactionsListState extends State<TransactionsList> {
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           leading: InkWell(
-            onTap: (){
+            onTap: () {
               Navigator.pop(context);
             },
-            child: Center(child: FaIcon(FontAwesomeIcons.times,color:Colors.black),),
+            child: Center(
+              child: FaIcon(FontAwesomeIcons.times, color: Colors.black),
             ),
-          title: Image.asset("assets/images/logo.png" , height: 40,)
-        ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                Row(children: [
-                  FaIcon(FontAwesomeIcons.boxes),
-                  SizedBox(width: 10,),
-                  Text("transactions".tr(),style: TextStyle(fontSize: 20),)
-                ],),
-                SizedBox(height: 15,),
-
-                Row(children: [   
-                CustomeButton(title: "add_transaction",icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/transactions_editor'),),                
-                !_openFilter ? CustomeButton(title: "filter",icon: FontAwesomeIcons.search,handler: toggleFilter,):
-                CustomeButton(title: "close",icon: FontAwesomeIcons.times,handler: toggleFilter,),
-                ],),
-
-
-   _openFilter ?   Column(children: [
-    Divider(),
-      Row(children: [
-      Expanded(
-        child: FlatButton(
-        onPressed: () {
-              DatePicker.showDateTimePicker(context,showTitleActions: true,minTime: DateTime(2021, 1, 1),
-              maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                setState(() {
-                  startFrom = date;
-                });
-              }, onConfirm: (date) {
-                setState(() {
-                  startFrom = date;
-                });
-                }, 
-              currentTime: startFrom,
-              locale: LocaleType.ar);
-        },
+          ),
+          title: Image.asset(
+            "assets/images/logo.png",
+            height: 40,
+          )),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          Text(
-              'startFrom'.tr(),
-              style: TextStyle(color: Colors.blue),
-        ),
-        Text(
-              startFrom.toString(),
-              style: TextStyle(color: Colors.grey,fontFamily: "Lato",fontSize: 12),
-        )
-        ],)),
-        ),
-
-      Expanded(
-        child: FlatButton(
-        onPressed: () {
-              DatePicker.showDatePicker(context,showTitleActions: true,minTime: DateTime(2021, 1, 1),
-              maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                setState(() {
-                  endAt = date;
-                });
-              }, onConfirm: (date) {
-                setState(() {
-                  endAt = date;
-                });
-                }, 
-              currentTime: endAt,
-              locale: LocaleType.ar);
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          Text(
-              'endAt'.tr(),
-              style: TextStyle(color: Colors.blue),
-        ),
-        Text(
-              endAt.toString(),
-              style: TextStyle(color: Colors.grey,fontFamily: "Lato",fontSize: 12),
-        )
-        ],)),
-        ),
-
-      ],),
-
-      SizedBox(height: 10,),
-
-
-                SizedBox(height: 20,),
-
-                 Row(children: [
-    
-                CupertinoSwitch(
-                  value: _isCustomer,
-                  onChanged: (value) {
-                    setState(() {
-                      _isCustomer = value;
-                    });
-                  },
+            Row(
+              children: [
+                FaIcon(FontAwesomeIcons.boxes),
+                SizedBox(
+                  width: 10,
                 ),
+                Text(
+                  "transactions".tr(),
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 15,
+            ),
 
-                SizedBox(width: 15,),
-
-                Text(_isCustomer ? "customer".tr() : "supplier".tr())
-
-                ],),
-
-                _isCustomer ? SizedBox() : SizedBox(height: 10,),
-
-
-               _isCustomer ? SizedBox() : isLoading ? Text("loading") : DropdownButton<Supplier>(
-                  value: currentSupplier,
-                  isExpanded: true,
-                  items: suppliers.map((Supplier supplier) {
-                    return new DropdownMenuItem<Supplier>(
-                      value: supplier,
-                      child: new Text(supplier.name),
-                    );
-                  }).toList(),
-                  hint: Text("select_supplier_hint".tr()),
-                  onChanged: (newValue) {
-                    setState(() {
-                      currentSupplier = newValue;
-                    });
-                  },
+            Row(
+              children: [
+                CustomeButton(
+                  title: "add_transaction",
+                  icon: FontAwesomeIcons.plus,
+                  handler: () => Navigator.pushNamed(context, '/transactions_editor',
+                      arguments: TranscationEditorArgumants(
+                        onSaveFinish: _reloadData,
+                      )),
                 ),
+                !_openFilter
+                    ? CustomeButton(
+                        title: "filter",
+                        icon: FontAwesomeIcons.search,
+                        handler: toggleFilter,
+                      )
+                    : CustomeButton(
+                        title: "close",
+                        icon: FontAwesomeIcons.times,
+                        handler: toggleFilter,
+                      ),
+              ],
+            ),
 
-                
-                 !_isCustomer ? SizedBox() :  SizedBox(height: 10,),
-  
+            _openFilter
+                ? Column(
+                    children: [
+                      Divider(),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FlatButton(
+                                onPressed: () {
+                                  DatePicker.showDateTimePicker(context,
+                                      showTitleActions: true,
+                                      minTime: DateTime(2021, 1, 1),
+                                      maxTime: DateTime(2050, 1, 1), onChanged: (date) {
+                                    setState(() {
+                                      startFrom = date;
+                                    });
+                                  }, onConfirm: (date) {
+                                    setState(() {
+                                      startFrom = date;
+                                    });
+                                  }, currentTime: startFrom, locale: LocaleType.ar);
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'startFrom'.tr(),
+                                      style: TextStyle(color: Colors.blue),
+                                    ),
+                                    Text(
+                                      startFrom.toString(),
+                                      style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
+                                    )
+                                  ],
+                                )),
+                          ),
+                          Expanded(
+                            child: FlatButton(
+                                onPressed: () {
+                                  DatePicker.showDatePicker(context,
+                                      showTitleActions: true,
+                                      minTime: DateTime(2021, 1, 1),
+                                      maxTime: DateTime(2050, 1, 1), onChanged: (date) {
+                                    setState(() {
+                                      endAt = date;
+                                    });
+                                  }, onConfirm: (date) {
+                                    setState(() {
+                                      endAt = date;
+                                    });
+                                  }, currentTime: endAt, locale: LocaleType.ar);
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'endAt'.tr(),
+                                      style: TextStyle(color: Colors.blue),
+                                    ),
+                                    Text(
+                                      endAt.toString(),
+                                      style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
+                                    )
+                                  ],
+                                )),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          CupertinoSwitch(
+                            value: _isCustomer,
+                            onChanged: (value) {
+                              setState(() {
+                                _isCustomer = value;
+                              });
+                            },
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Text(_isCustomer ? "customer".tr() : "supplier".tr())
+                        ],
+                      ),
+                      _isCustomer
+                          ? SizedBox()
+                          : SizedBox(
+                              height: 10,
+                            ),
+                      _isCustomer
+                          ? SizedBox()
+                          : isLoading
+                              ? Text("loading")
+                              : DropdownButton<Supplier>(
+                                  value: currentSupplier,
+                                  isExpanded: true,
+                                  items: suppliers.map((Supplier supplier) {
+                                    return new DropdownMenuItem<Supplier>(
+                                      value: supplier,
+                                      child: new Text(supplier.name),
+                                    );
+                                  }).toList(),
+                                  hint: Text("select_supplier_hint".tr()),
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      currentSupplier = newValue;
+                                    });
+                                  },
+                                ),
+                      !_isCustomer
+                          ? SizedBox()
+                          : SizedBox(
+                              height: 10,
+                            ),
+                      !_isCustomer
+                          ? SizedBox()
+                          : DropdownSearch<Customer>(
+                              mode: Mode.MENU,
+                              showSearchBox: true,
+                              itemAsString: (Customer u) => u.name.toString(),
+                              label: "customer".tr(),
+                              hint: "select_customer_hint".tr(),
+                              isFilteredOnline: true,
+                              onFind: (String filter) => CustomerServices.getCustomers("1", filter),
+                              onChanged: (Customer data) {
+                                setState(() {
+                                  currentCustomer = data;
+                                });
+                              },
+                            ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      CustomeButton(
+                        title: "confirm".tr(),
+                        handler: search,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Divider(),
+                    ],
+                  )
+                : SizedBox(),
 
-                !_isCustomer ? SizedBox() : DropdownSearch<Customer>(
-                  mode: Mode.MENU,
-                  showSearchBox: true,
-                  itemAsString: (Customer u) => u.name.toString(),
-                  label: "customer".tr(),
-                  hint: "select_customer_hint".tr(),
-                  isFilteredOnline : true,
-                  onFind: (String filter) => CustomerServices.getCustomers("1", filter),
-                  onChanged: (Customer data) {
-                    setState(() {
-                      currentCustomer = data;
-                    });
-                  },
-                ),
-                SizedBox(height: 10,),
-                CustomeButton(title: "confirm".tr(),handler: search,),
-                  SizedBox(height: 10,),
+            // CustomeButton(title: "confirm".tr(),handler: search,),
 
-                  Divider(),
-              ],) : SizedBox(),
-            
-
-      // CustomeButton(title: "confirm".tr(),handler: search,),
-
-                transactions.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),
-                transactions.isEmpty && !isLoading ? SizedBox() : Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                          child: Pagination(
-                          progress: loadingKit,
-                          pageBuilder: (currentListSize) => getStocksLocal(),
-                          itemBuilder: (index, Transaction transaction) => ListItem(
+            transactions.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),
+            transactions.isEmpty && !isLoading
+                ? SizedBox()
+                : Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                      child: Pagination(
+                        progress: loadingKit,
+                        pageBuilder: (currentListSize) => getStocksLocal(),
+                        itemBuilder: (index, Transaction transaction) => ListItem(
                             amount: transaction.amount.toString(),
                             id: transaction.id.toString(),
                             transaction: transaction,
                             supplier: transaction.supplier,
                             customer: transaction.customer,
-                            type : transaction.type
-                            ),
-                              ),
-                        ),
-                ),
-
-
-              ],),
-          ),
+                            type: transaction.type),
+                      ),
+                    ),
+                  ),
+          ],
+        ),
+      ),
     );
   }
 }
-
 
 class ListItem extends StatelessWidget {
   String amount;
@@ -332,121 +391,135 @@ class ListItem extends StatelessWidget {
   String type;
 
   Transaction transaction;
-  
 
-  ListItem({this.amount,
-  this.id,this.image,this.transaction,this.supplier,this.customer,
-  this.type
-  });
+  ListItem({this.amount, this.id, this.image, this.transaction, this.supplier, this.customer, this.type});
   @override
   Widget build(BuildContext context) {
     return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(children: [
-
-       SizedBox(width: 25,),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-          Text(
-          '#$id',
-            style: TextStyle(
-              fontSize: 15,
-              color: const Color(0xffe6d7d7),
+            SizedBox(
+              width: 25,
             ),
-            textAlign: TextAlign.left,
-          ),
-
-          Text(
-          ' ${"amount".tr()} : $amount',
-            style: TextStyle(
-                fontSize: 15,
-              color: const Color(0xff3a3a3a),
-              fontWeight: FontWeight.w300,
-            ),
-            textAlign: TextAlign.left,
-          ),
-
-          Text(
-          '$type',
-            style: TextStyle(
-                fontSize: 15,
-              color: const Color(0xff3a3a3a),
-              fontWeight: FontWeight.w300,
-            ),
-            textAlign: TextAlign.left,
-          ),
-          
-       customer == null ? SizedBox() : Text(
-          '${"customer".tr()} : ${customer.name}',
-            style: TextStyle(
-            fontSize: 13,
-              color: const Color(0xff3a3a3a),
-              fontWeight: FontWeight.w300,
-            ),
-            textAlign: TextAlign.start,
-          ),
-
-
-          customer == null ? SizedBox() : SizedBox(height: 10,),
-          supplier == null ? SizedBox() :  Text(
-          '${"supplier".tr()} : ${supplier.name}',
-            style: TextStyle(
-                fontSize: 13,
-              color: const Color(0xff3a3a3a),
-              fontWeight: FontWeight.w300,
-            ),
-            textAlign: TextAlign.left,
-          ),
-
-          supplier == null ? SizedBox() : Text(
-          '${supplier.notes}',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey,
-              fontWeight: FontWeight.w300,
-            ),
-            textAlign: TextAlign.start,
-          ),
-        ],)
-      ],),
-    Divider()
-      ],);
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '#$id',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: const Color(0xffe6d7d7),
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+                Text(
+                  ' ${"amount".tr()} : $amount',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: const Color(0xff3a3a3a),
+                    fontWeight: FontWeight.w300,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+                Text(
+                  '$type',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: const Color(0xff3a3a3a),
+                    fontWeight: FontWeight.w300,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+                customer == null
+                    ? SizedBox()
+                    : Text(
+                        '${"customer".tr()} : ${customer.name}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: const Color(0xff3a3a3a),
+                          fontWeight: FontWeight.w300,
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                customer == null
+                    ? SizedBox()
+                    : SizedBox(
+                        height: 10,
+                      ),
+                supplier == null
+                    ? SizedBox()
+                    : Text(
+                        '${"supplier".tr()} : ${supplier.name}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: const Color(0xff3a3a3a),
+                          fontWeight: FontWeight.w300,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                supplier == null
+                    ? SizedBox()
+                    : Text(
+                        '${supplier.notes}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w300,
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+              ],
+            )
+          ],
+        ),
+        Divider()
+      ],
+    );
   }
 }
-
-
 
 class CategoryPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return  Expanded(
-               child: Column(
-               mainAxisSize: MainAxisSize.max,
-               crossAxisAlignment: CrossAxisAlignment.center,
-               mainAxisAlignment: MainAxisAlignment.center,
-               children: [
-                 FaIcon(FontAwesomeIcons.mapMarked,size: 75,color: const Color(0xffe6d7d7),),
-                 SizedBox(height: 12,),
-                  Center(
-                    child: Text(
-                     'start_add_your_stocks'.tr(),
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: const Color(0xffdbd3d3),
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                SizedBox(height: 12,),
-                SizedBox(
-                width: 200,
-                child: CustomeButton(title: "add_region",
-                icon: FontAwesomeIcons.plus,handler: () => Navigator.pushNamed(context, '/region_editor'),)),
-
-             ],),
-           ) ;
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FaIcon(
+            FontAwesomeIcons.mapMarked,
+            size: 75,
+            color: const Color(0xffe6d7d7),
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          Center(
+            child: Text(
+              'start_add_your_stocks'.tr(),
+              style: TextStyle(
+                fontSize: 25,
+                color: const Color(0xffdbd3d3),
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          SizedBox(
+              width: 200,
+              child: CustomeButton(
+                title: "add_region",
+                icon: FontAwesomeIcons.plus,
+                handler: () => Navigator.pushNamed(context, '/region_editor'),
+              )),
+        ],
+      ),
+    );
   }
 }

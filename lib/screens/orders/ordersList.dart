@@ -14,6 +14,8 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../validator.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'changeStatus.dart';
+
 class OrderList extends StatefulWidget {
   String keyword;
   String customerID;
@@ -52,7 +54,11 @@ class _OrderListState extends State<OrderList> {
 
   Future<List<Order>> getProductsLocal() async {
     List<Order> temp = await OrderServices.getOrders(
-        currentPage.toString(), widget.keyword, widget.customerID, false);
+      currentPage.toString(),
+      widget.keyword,
+      widget.customerID,
+      false,
+    );
     setState(() {
       orders = orders.isEmpty ? temp : orders;
       currentPage = currentPage + 1;
@@ -66,9 +72,21 @@ class _OrderListState extends State<OrderList> {
   void initState() {
     timeago.setLocaleMessages('ar', timeago.ArMessages());
 
-    super.initState();
     setState(() {
       keyword.text = widget.keyword;
+      isLoading = true;
+    });
+    super.initState();
+  }
+
+  Future<void> _reloadData() async {
+    setState(() {
+      orders.clear();
+      currentPage = 1;
+      isLoading = false;
+    });
+    await Future.delayed(Duration(milliseconds: 100));
+    setState(() {
       isLoading = true;
     });
   }
@@ -96,8 +114,7 @@ class _OrderListState extends State<OrderList> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(
-              widget.keyword == null && widget.customerID == null ? 0 : 3.0),
+          padding: EdgeInsets.all(widget.keyword == null && widget.customerID == null ? 0 : 3.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -138,10 +155,7 @@ class _OrderListState extends State<OrderList> {
                               handler: () {
                                 if (_formKey.currentState.validate()) {
                                   Navigator.pushNamed(context, '/orders',
-                                      arguments: {
-                                        "keyword": keyword.text,
-                                        "customerId": null
-                                      });
+                                      arguments: {"keyword": keyword.text, "customerId": null});
                                 }
                               },
                             ),
@@ -160,9 +174,7 @@ class _OrderListState extends State<OrderList> {
                           pageBuilder: (currentListSize) => getProductsLocal(),
                           itemBuilder: (index, Order order) => ListItem(
                             id: order.id.toString(),
-                            time: timeago.format(
-                            (DateTime.parse(order.createdAt)),
-                            locale: 'ar'),
+                            time: timeago.format((DateTime.parse(order.createdAt)), locale: 'ar'),
                             total: order.total.toString(),
                             currency: order.currency.toString(),
                             status: order.status.toString(),
@@ -171,6 +183,7 @@ class _OrderListState extends State<OrderList> {
                             address: order.address.address,
                             customerName: order.customer.name,
                             customerNumber: order.customer.phoneNumber,
+                            onRefreshTriggered: _reloadData,
                           ),
                         ),
                       ),
@@ -190,12 +203,7 @@ class CustomeTextField extends StatelessWidget {
   dynamic validator;
   bool obscureTextbool;
 
-  CustomeTextField(
-      {this.hintTxt,
-      this.labelTxt,
-      this.controller,
-      this.validator,
-      this.obscureTextbool = false});
+  CustomeTextField({this.hintTxt, this.labelTxt, this.controller, this.validator, this.obscureTextbool = false});
 
   @override
   Widget build(BuildContext context) {
@@ -228,20 +236,24 @@ class ListItem extends StatelessWidget {
   String channel;
   String customerName;
   String customerNumber;
+  final VoidCallback onRefreshTriggered;
 
   String currency;
   List<Items> items;
 
-  ListItem(
-      {this.address,
-      this.id,
-      this.time,
-      this.total,
-      this.status,
-      this.currency,
-      this.items,
-      this.customerNumber,
-      this.customerName,this.channel});
+  ListItem({
+    this.address,
+    this.id,
+    this.time,
+    this.total,
+    this.status,
+    this.currency,
+    this.items,
+    this.customerNumber,
+    this.customerName,
+    this.channel,
+    this.onRefreshTriggered,
+  });
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -277,7 +289,6 @@ class ListItem extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 Text(
                   channel,
                   style: TextStyle(
@@ -287,7 +298,6 @@ class ListItem extends StatelessWidget {
                   ),
                   textAlign: TextAlign.left,
                 ),
-
                 Text(
                   status.tr(),
                   style: TextStyle(
@@ -354,19 +364,21 @@ class ListItem extends StatelessWidget {
                           child: CustomeButton(
                         title: "order_items".tr(),
                         icon: null,
-                        handler: () => Navigator.pushNamed(
-                            context, '/orders_items',
-                            arguments: items),
+                        handler: () => Navigator.pushNamed(context, '/orders_items', arguments: items),
                       )),
                       Expanded(
                           child: CustomeButton(
                         title: "change_order_status".tr(),
                         icon: null,
                         handler: () => Navigator.pushNamed(
-                            context, '/change_status', arguments: {
-                          "orderId": id.toString(),
-                          "currentStatus": status.toString()
-                        }),
+                          context,
+                          '/change_status',
+                          arguments: ChangeOrderDetailsArguments(
+                            currentStatus: status,
+                            orderId: id,
+                            onSaveFinish: onRefreshTriggered,
+                          ),
+                        ),
                       )),
                     ],
                   ),

@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -32,55 +31,52 @@ class TaxesEditor extends StatefulWidget {
   _TaxesEditorState createState() => _TaxesEditorState();
 }
 
-
 class _TaxesEditorState extends State<TaxesEditor> {
-  
-   final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
-   TextEditingController tax1Title = new TextEditingController();
-   TextEditingController tax1Amount = new TextEditingController();
+  TextEditingController tax1Title = new TextEditingController();
+  TextEditingController tax1Amount = new TextEditingController();
 
-   TextEditingController tax2Title = new TextEditingController();
-   TextEditingController tax2Amount = new TextEditingController();
+  TextEditingController tax2Title = new TextEditingController();
+  TextEditingController tax2Amount = new TextEditingController();
 
-   TextEditingController tax3Title = new TextEditingController();
-   TextEditingController tax3Amount = new TextEditingController();
+  TextEditingController tax3Title = new TextEditingController();
+  TextEditingController tax3Amount = new TextEditingController();
 
-   bool isLoading = false;
+  bool isLoading = false;
 
-     var loadingKit = Center(
-      child: Column(children: [
-        SizedBox(height: 20,),
+  var loadingKit = Center(
+    child: Column(
+      children: [
+        SizedBox(
+          height: 20,
+        ),
         SpinKitSquareCircle(
-        color: Colors.white,
-        size: 50.0,
-      ),
-      ],),
-    );
- 
-
-
+          color: Colors.white,
+          size: 50.0,
+        ),
+      ],
+    ),
+  );
 
   initValues() async {
-  
-  setState(() {
+    setState(() {
       isLoading = true;
-  });
+    });
 
-  Taxes taxes = await TaxesService.getTaxes();
+    Taxes taxes = await TaxesService.getTaxes();
 
-  setState(() {
-    isLoading = false;
-    tax1Title.text = taxes.tax1Title;
-    tax1Amount.text = taxes.tax1Amount.toString();
+    setState(() {
+      isLoading = false;
+      tax1Title.text = taxes.tax1Title;
+      tax1Amount.text = taxes.tax1Amount.toString();
 
-    tax2Title.text = taxes.tax2Title;
-    tax2Amount.text = taxes.tax2Amount.toString();
+      tax2Title.text = taxes.tax2Title;
+      tax2Amount.text = taxes.tax2Amount.toString();
 
-    tax3Title.text = taxes.tax3Title;
-    tax3Amount.text = taxes.tax3Amount.toString();
-  });
-
+      tax3Title.text = taxes.tax3Title;
+      tax3Amount.text = taxes.tax3Amount.toString();
+    });
   }
 
   @override
@@ -89,18 +85,16 @@ class _TaxesEditorState extends State<TaxesEditor> {
     initValues();
   }
 
-
   @override
   Widget build(BuildContext context) {
+    save() async {
+      setState(() {
+        isLoading = true;
+      });
 
-  save() async {
-
-    setState(() {
-      isLoading = true;
-    });
-
-    if (_formKey.currentState.validate()) {
-      await TaxesService.saveTaxes(
+      if (_formKey.currentState.validate()) {
+        //TODO: bug: doesn't work at ALL
+        await TaxesService.saveTaxes(
           tax1Title: tax1Title.text,
           tax1Amount: tax1Amount.text.toString(),
           tax2Title: tax2Title.text,
@@ -108,28 +102,29 @@ class _TaxesEditorState extends State<TaxesEditor> {
           tax3Title: tax3Title.text,
           tax3Amount: tax3Amount.text.toString(),
         );
+      }
+
+      setState(() {
+        isLoading = false;
+      });
     }
 
-    setState(() {
-      isLoading = false;
-    });
-
-  }
-
     return Scaffold(
-      bottomNavigationBar:  InkWell(
+      bottomNavigationBar: InkWell(
         onTap: save,
-          child: Container(
+        child: Container(
           child: Center(
-            child: isLoading ? loadingKit : Text(
-              "save".tr(),
-              style: TextStyle(
-                fontSize: 20,
-                color: const Color(0xffffffff),
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.left,
-            ),
+            child: isLoading
+                ? loadingKit
+                : Text(
+                    "save".tr(),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: const Color(0xffffffff),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
           ),
           height: 80.0,
           decoration: BoxDecoration(
@@ -143,105 +138,99 @@ class _TaxesEditorState extends State<TaxesEditor> {
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           leading: new IconButton(
-          icon: FaIcon(FontAwesomeIcons.arrowRight,color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-          title: Image.asset("assets/images/logo.png" , height: 40,)
-        ),
-        backgroundColor: Colors.white,
-        body: isLoading ? loadingKit : SingleChildScrollView(
+            icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Image.asset(
+            "assets/images/logo.png",
+            height: 40,
+          )),
+      backgroundColor: Colors.white,
+      body: isLoading
+          ? loadingKit
+          : SingleChildScrollView(
               child: Form(
-              key: _formKey,
-              child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                Padding(
+                key: _formKey,
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child:   Text("الضريبة",
-                    style: TextStyle(  
-                      fontSize: 20,
-                      color: const Color(0xff000000),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,  
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "الضريبة",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: const Color(0xff000000),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomeTextField(
+                          controller: tax1Title,
+                          hintTxt: "عنوان الضريبة 1".tr(),
+                          labelTxt: "الضريبة 1".tr(),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomeTextField(
+                          controller: tax1Amount,
+                          hintTxt: "قيمة الضريبة 1".tr(),
+                          labelTxt: "قيمة الضريبة 1".tr(),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomeTextField(
+                          controller: tax2Title,
+                          hintTxt: "عنوان الضريبة 2".tr(),
+                          labelTxt: "الضريبة 2".tr(),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomeTextField(
+                          controller: tax2Amount,
+                          hintTxt: "قيمة الضريبة 2".tr(),
+                          labelTxt: "قيمة الضريبة 2".tr(),
+                        ),
+                      ),
+                      Divider(),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomeTextField(
+                          controller: tax3Title,
+                          hintTxt: "عنوان الضريبة 3".tr(),
+                          labelTxt: "الضريبة 3".tr(),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomeTextField(
+                          controller: tax3Amount,
+                          hintTxt: "قيمة الضريبة 3".tr(),
+                          labelTxt: "قيمة الضريبة 3".tr(),
+                        ),
+                      ),
+                      Divider(),
+                      SizedBox(
+                        height: 20,
+                      ),
+                    ],
                   ),
                 ),
- 
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomeTextField(
-                    controller:  tax1Title,
-                    hintTxt: "عنوان الضريبة 1".tr(),
-                    labelTxt: "الضريبة 1".tr(),
-                  ),
               ),
- 
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomeTextField(
-                    controller:  tax1Amount,
-                    hintTxt: "قيمة الضريبة 1".tr(),
-                    labelTxt: "قيمة الضريبة 1".tr(),
-                  ),
-              ),
-
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomeTextField(
-                    controller:  tax2Title,
-                    hintTxt: "عنوان الضريبة 2".tr(),
-                    labelTxt: "الضريبة 2".tr(),
-                  ),
-              ),
- 
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomeTextField(
-                    controller:  tax2Amount,
-                    hintTxt: "قيمة الضريبة 2".tr(),
-                    labelTxt: "قيمة الضريبة 2".tr(),
-                  ),
-              ),
-
-              Divider(),
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomeTextField(
-                    controller:  tax3Title,
-                    hintTxt: "عنوان الضريبة 3".tr(),
-                    labelTxt: "الضريبة 3".tr(),
-                  ),
-              ),
- 
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomeTextField(
-                    controller:  tax3Amount,
-                    hintTxt: "قيمة الضريبة 3".tr(),
-                    labelTxt: "قيمة الضريبة 3".tr(),
-                  ),
-              ),
-
-              Divider(),
-
-
-               SizedBox(height: 20,),
-                
-              ],),
             ),
-          ),
-        ),
     );
   }
 }
-
 
 class CustomeTextField extends StatelessWidget {
   String hintTxt;
@@ -250,27 +239,26 @@ class CustomeTextField extends StatelessWidget {
   dynamic validator;
   bool obscureTextbool;
 
-  CustomeTextField({this.hintTxt,this.labelTxt,this.controller,this.validator,this.obscureTextbool = false});
+  CustomeTextField({this.hintTxt, this.labelTxt, this.controller, this.validator, this.obscureTextbool = false});
 
   @override
   Widget build(BuildContext context) {
-    return  TextFormField(
-            obscureText: obscureTextbool,
-            validator: validator,
-            controller: controller,
-            decoration: new InputDecoration(
-              hintText: hintTxt,
-              labelText: labelTxt,
-                enabledBorder: UnderlineInputBorder(      
-                borderSide: BorderSide(color: Color(0xFFECDFDF)),   
-              ),  
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFECDFDF)),
-              ),
-              border: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFECDFDF)),
-              )
-                  ),
-            );
+    return TextFormField(
+      obscureText: obscureTextbool,
+      validator: validator,
+      controller: controller,
+      decoration: new InputDecoration(
+          hintText: hintTxt,
+          labelText: labelTxt,
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFECDFDF)),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFECDFDF)),
+          ),
+          border: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFECDFDF)),
+          )),
+    );
   }
 }

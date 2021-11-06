@@ -1,6 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:eckit/components/customeButton.dart';
 import 'package:eckit/models/Attribute.dart';
@@ -9,19 +15,23 @@ import 'package:eckit/models/option.dart';
 import 'package:eckit/models/product.dart';
 import 'package:eckit/services/categories_service.dart';
 import 'package:eckit/services/product_service.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+
 import '../../validator.dart';
 
-class ProductEditor extends StatefulWidget {
-  Product product;
+@immutable
+class ProductEditorArgumants {
+  final Product product;
+  final VoidCallback onSaveFinish;
+  ProductEditorArgumants({
+    this.product,
+    this.onSaveFinish,
+  });
+}
 
-  ProductEditor({this.product});
+class ProductEditor extends StatefulWidget {
+  final ProductEditorArgumants productArgs;
+
+  ProductEditor({this.productArgs});
 
   @override
   _ProductEditorState createState() => _ProductEditorState();
@@ -36,8 +46,6 @@ class _ProductEditorState extends State<ProductEditor> {
   TextEditingController rank = new TextEditingController();
   TextEditingController priceAfterDiscount = new TextEditingController();
 
-  
-
   bool _isActive = true;
   bool _stockStatus = true;
   bool isLoading = false;
@@ -47,25 +55,10 @@ class _ProductEditorState extends State<ProductEditor> {
   List<File> images = [];
 
   List<Attribute> attrbuites = [
-    Attribute(
-      title: "Size",
-      isRequired: true,
-      type: "radio",
-      options: [
-        Option(
-          title: "Small",
-          description: "small size 50*60",
-          stockStatus: true,
-          addedPrice: 0
-          ),
-      ]
-      ),
-    Attribute(
-      title: "extera",
-      isRequired: true,
-      type: "checkbox",
-      options: []
-      )
+    Attribute(title: "Size", isRequired: true, type: "radio", options: [
+      Option(title: "Small", description: "small size 50*60", stockStatus: true, addedPrice: 0),
+    ]),
+    Attribute(title: "extera", isRequired: true, type: "checkbox", options: [])
   ];
 
   //  File _image;
@@ -116,25 +109,33 @@ class _ProductEditorState extends State<ProductEditor> {
       List<String> imgsbase64 = [];
 
       for (var image in images) {
-        List<int> imageBytes = await image.readAsBytesSync();
+        final imageBytes = await image.readAsBytes();
         String base64Image = base64Encode(imageBytes);
         imgsbase64.add(base64Image);
       }
 
-      await ProductServices.saveProduct(
-        name: name.text,
-        description: description.text,
-        isActive: _isActive,
-        images: imgsbase64.length > 0 ? imgsbase64 : null,
-        id: widget.product == null ? null : widget.product.id.toString(),
-        cost: double.parse(cost.text),
-        unitType: currentUnit,
-        price: double.parse(price.text),
-        categoryId: currentCategory.id.toString(),
-        priceAfterDiscount: priceAfterDiscount.text == "" ? null : double.parse(priceAfterDiscount.text),
-        stockStatus: _stockStatus,
-        index: int.parse(rank.text)
-      );
+      try {
+        //TODO: [Issue] product can't be saved
+        final product = widget.productArgs?.product;
+        await ProductServices.saveProduct(
+          name: name.text,
+          description: description.text,
+          isActive: _isActive,
+          images: imgsbase64.length > 0 ? imgsbase64 : null,
+          id: product == null ? null : product.id.toString(),
+          cost: double.parse(cost.text),
+          unitType: currentUnit,
+          price: double.parse(price.text),
+          categoryId: currentCategory.id.toString(),
+          priceAfterDiscount: double.tryParse(priceAfterDiscount.text),
+          stockStatus: _stockStatus,
+          index: int.parse(rank.text),
+        );
+        Navigator.pop(context);
+        widget.productArgs?.onSaveFinish?.call();
+      } catch (_) {
+        /* do nothing */
+      }
     }
 
     setState(() {
@@ -180,21 +181,23 @@ class _ProductEditorState extends State<ProductEditor> {
 
     List<Category> temp = await CategoryServices.getAllCategories();
 
-    if (widget.product != null) {
+    final product = widget.productArgs?.product;
+
+    if (product != null) {
       setState(() {
-        name.text = widget.product.name;
-        cost.text = widget.product.cost.toString();
-        price.text = widget.product.price.toString();
-        priceAfterDiscount.text = widget.product.priceAfterDiscount == null ? null : widget.product.priceAfterDiscount.toString();
-        _stockStatus = widget.product.stockStatus;
-        rank.text = widget.product.index.toString();
-        description.text = widget.product.description;
-        _isActive = widget.product.isActive;
-        currentUnit = widget.product.unitType;
-        currentCategory = widget.product.category;
-        imagesUrl = widget.product.images;
+        name.text = product.name;
+        cost.text = product.cost.toString();
+        price.text = product.price.toString();
+        priceAfterDiscount.text = product.priceAfterDiscount?.toString();
+        _stockStatus = product.stockStatus;
+        rank.text = product.index.toString();
+        description.text = product.description;
+        _isActive = product.isActive;
+        currentUnit = product.unitType;
+        currentCategory = product.category;
+        imagesUrl = product.images;
       });
-    }else{
+    } else {
       rank.text = "1";
     }
 
@@ -210,7 +213,7 @@ class _ProductEditorState extends State<ProductEditor> {
     initValues();
   }
 
-  updateWidget(){
+  updateWidget() {
     setState(() {});
   }
 
@@ -268,9 +271,7 @@ class _ProductEditorState extends State<ProductEditor> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          widget.product != null
-                              ? "edit_product".tr()
-                              : "add_product".tr(),
+                          widget.productArgs != null ? "edit_product".tr() : "add_product".tr(),
                           style: TextStyle(
                             fontSize: 20,
                             color: const Color(0xff000000),
@@ -312,7 +313,6 @@ class _ProductEditorState extends State<ProductEditor> {
                         hintTxt: "rank_hint".tr(),
                         labelTxt: "rank_label".tr(),
                       ),
-
 
                       CustomeTextField(
                         controller: priceAfterDiscount,
@@ -400,21 +400,23 @@ class _ProductEditorState extends State<ProductEditor> {
                         ],
                       ),
 
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
 
-                    //   ExpansionTile(
-                    //   title: Text("advance_option".tr()),
-                    //   children: [
-                    //   ... attrbuites.map((attrbuite) => AttributeW(
-                    //     title: attrbuite.title,
-                    //     type: attrbuite.type,
-                    //     isRequired: attrbuite.isRequired,
-                    //     attribute: attrbuite,
-                    //     updateWidget: updateWidget,
-                    //   )).toList(),        
-                    //   CustomeButton(title: "add_new_attribute",icon: FontAwesomeIcons.plus ),
-                    //   ],
-                    //  ),
+                      //   ExpansionTile(
+                      //   title: Text("advance_option".tr()),
+                      //   children: [
+                      //   ... attrbuites.map((attrbuite) => AttributeW(
+                      //     title: attrbuite.title,
+                      //     type: attrbuite.type,
+                      //     isRequired: attrbuite.isRequired,
+                      //     attribute: attrbuite,
+                      //     updateWidget: updateWidget,
+                      //   )).toList(),
+                      //   CustomeButton(title: "add_new_attribute",icon: FontAwesomeIcons.plus ),
+                      //   ],
+                      //  ),
 
                       SizedBox(
                         height: 20,
@@ -422,15 +424,12 @@ class _ProductEditorState extends State<ProductEditor> {
                       images.length != 0
                           ? Padding(
                               padding: const EdgeInsets.symmetric(vertical: 15),
-                              child: FlatButton(
-                                  onPressed: addnewImageToList,
-                                  child: Text("اختر المزيد من الصور")),
+                              child: FlatButton(onPressed: addnewImageToList, child: Text("اختر المزيد من الصور")),
                             )
                           : InkWell(
                               onTap: addnewImageToList,
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
+                                padding: const EdgeInsets.symmetric(vertical: 15),
                                 child: Container(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -502,21 +501,15 @@ class _ProductEditorState extends State<ProductEditor> {
                                                         'حذف',
                                                         style: TextStyle(
                                                           fontSize: 15,
-                                                          color: const Color(
-                                                              0xffffffff),
-                                                          fontWeight:
-                                                              FontWeight.w300,
+                                                          color: const Color(0xffffffff),
+                                                          fontWeight: FontWeight.w300,
                                                         ),
-                                                        textAlign:
-                                                            TextAlign.left,
+                                                        textAlign: TextAlign.left,
                                                       ),
                                                     ),
                                                     decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      color: const Color(
-                                                          0xffff6a37),
+                                                      borderRadius: BorderRadius.circular(10.0),
+                                                      color: const Color(0xffff6a37),
                                                     ),
                                                   ),
                                                 )
@@ -543,9 +536,7 @@ class _ProductEditorState extends State<ProductEditor> {
                                         children: [
                                           ...imagesUrl
                                               .map((e) => Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
+                                                    padding: const EdgeInsets.all(8.0),
                                                     child: Column(
                                                       children: [
                                                         Image.network(
@@ -568,28 +559,17 @@ class _ProductEditorState extends State<ProductEditor> {
                                                             child: Center(
                                                               child: Text(
                                                                 'حذف',
-                                                                style:
-                                                                    TextStyle(
+                                                                style: TextStyle(
                                                                   fontSize: 15,
-                                                                  color: const Color(
-                                                                      0xffffffff),
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w300,
+                                                                  color: const Color(0xffffffff),
+                                                                  fontWeight: FontWeight.w300,
                                                                 ),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .left,
+                                                                textAlign: TextAlign.left,
                                                               ),
                                                             ),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10.0),
-                                                              color: const Color(
-                                                                  0xffff6a37),
+                                                            decoration: BoxDecoration(
+                                                              borderRadius: BorderRadius.circular(10.0),
+                                                              color: const Color(0xffff6a37),
                                                             ),
                                                           ),
                                                         )
@@ -612,82 +592,86 @@ class _ProductEditorState extends State<ProductEditor> {
   }
 }
 
-
 class AttributeW extends StatelessWidget {
-        String title;
-        bool isRequired;
-        String type;
-        Attribute attribute;
-        dynamic updateWidget;
+  String title;
+  bool isRequired;
+  String type;
+  Attribute attribute;
+  dynamic updateWidget;
 
-        AttributeW({this.title,this.isRequired,this.type,this.attribute,this.updateWidget});
+  AttributeW({this.title, this.isRequired, this.type, this.attribute, this.updateWidget});
 
-        @override
-        Widget build(BuildContext context) {
-          return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-           CustomeTextField(
-            validator: Validator.notEmpty,
-            hintTxt: "attribute_hint".tr(),
-            labelTxt: "attribute_label".tr(),
-            controller: TextEditingController(text: title),
-            changeHandler: (newVal) => attribute.setTitle = newVal,
-           ),
-
-          SizedBox(height: 10,),
-
-          CustomeSwitchW(
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomeTextField(
+          validator: Validator.notEmpty,
+          hintTxt: "attribute_hint".tr(),
+          labelTxt: "attribute_label".tr(),
+          controller: TextEditingController(text: title),
+          changeHandler: (newVal) => attribute.setTitle = newVal,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        CustomeSwitchW(
             option1: "is_required".tr(),
             option2: "is_not_required".tr(),
             initValue: attribute.isRequired,
-            changeHandler: (newValue) => attribute.setIsRequired = newValue
-          ),
-
-          CustomeSwitchW(
+            changeHandler: (newValue) => attribute.setIsRequired = newValue),
+        CustomeSwitchW(
             option1: "radio".tr(),
             option2: "checkbox".tr(),
-            trackColor: Colors.blue, 
+            trackColor: Colors.blue,
             activeColor: Colors.pink,
             initValue: attribute.type == "radio",
-            changeHandler: (newValue) => attribute.setIsRequired = newValue
-          ),
-
-         attribute.options == null ? SizedBox() : Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(children: [
-              ... attribute.options.map((option) => OptionW(
-                title: option.title,
-                stockStatus: option.stockStatus,
-                description: option.description,
-                addedPrice: option.addedPrice.toString(),
-                option: option,
-                deleteHandler: attribute.removeOption,
-                updateWidget: updateWidget,
-                index : attribute.options.indexOf(option)
-              )).toList()
-            ],),
-          ),
-                                     
-          SizedBox(height: 10,),
-
-          SizedBox(
-            width: 200,
-            child: CustomeButton(title: "add_option",icon: FontAwesomeIcons.plus,
-            handler: () {
-              attribute.addOption();
-              updateWidget();
-             } ),
-          ),
-
-          SizedBox(height: 10,),
-          Divider(),
-          SizedBox(height: 10,),
-
-    ],);
+            changeHandler: (newValue) => attribute.setIsRequired = newValue),
+        attribute.options == null
+            ? SizedBox()
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    ...attribute.options
+                        .map((option) => OptionW(
+                            title: option.title,
+                            stockStatus: option.stockStatus,
+                            description: option.description,
+                            addedPrice: option.addedPrice.toString(),
+                            option: option,
+                            deleteHandler: attribute.removeOption,
+                            updateWidget: updateWidget,
+                            index: attribute.options.indexOf(option)))
+                        .toList()
+                  ],
+                ),
+              ),
+        SizedBox(
+          height: 10,
+        ),
+        SizedBox(
+          width: 200,
+          child: CustomeButton(
+              title: "add_option",
+              icon: FontAwesomeIcons.plus,
+              handler: () {
+                attribute.addOption();
+                updateWidget();
+              }),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Divider(),
+        SizedBox(
+          height: 10,
+        ),
+      ],
+    );
   }
 }
-
 
 class OptionW extends StatelessWidget {
   String title;
@@ -698,67 +682,65 @@ class OptionW extends StatelessWidget {
   dynamic deleteHandler;
   dynamic updateWidget;
   int index;
-  
 
-  OptionW({this.addedPrice,this.title,
-  this.stockStatus,this.description,
-  this.option,this.updateWidget,this.deleteHandler,this.index});
+  OptionW(
+      {this.addedPrice,
+      this.title,
+      this.stockStatus,
+      this.description,
+      this.option,
+      this.updateWidget,
+      this.deleteHandler,
+      this.index});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-                                  
-           CustomeTextField(
-            validator: Validator.notEmpty,
-            hintTxt: "option_hint".tr(),
-            labelTxt: "option_label".tr(),
-            controller: TextEditingController(text: option.title),
-            changeHandler: (newVal) => option.setTitle = newVal,
-           ),
-
-           CustomeTextField(
-            validator: Validator.notEmpty,
-            hintTxt: "option_hint_des".tr(),
-            labelTxt: "option_label_des".tr(),
-            controller: TextEditingController(text: option.description),
-            changeHandler: (newVal) => option.setDescription = newVal,
-           ),
-
-           CustomeTextField(
-            validator: Validator.notEmpty,
-            hintTxt: "added_price_hint".tr(),
-            labelTxt: "added_price_label".tr(),
-            controller: TextEditingController(text: option.addedPrice == null ? null : option.addedPrice.toString(),),
-            changeHandler: (newVal) => option.setAddedPrice = newVal,
-           ),
-
-          SizedBox(height: 10,),
-      
-          CustomeSwitchW(
+        CustomeTextField(
+          validator: Validator.notEmpty,
+          hintTxt: "option_hint".tr(),
+          labelTxt: "option_label".tr(),
+          controller: TextEditingController(text: option.title),
+          changeHandler: (newVal) => option.setTitle = newVal,
+        ),
+        CustomeTextField(
+          validator: Validator.notEmpty,
+          hintTxt: "option_hint_des".tr(),
+          labelTxt: "option_label_des".tr(),
+          controller: TextEditingController(text: option.description),
+          changeHandler: (newVal) => option.setDescription = newVal,
+        ),
+        CustomeTextField(
+          validator: Validator.notEmpty,
+          hintTxt: "added_price_hint".tr(),
+          labelTxt: "added_price_label".tr(),
+          controller: TextEditingController(
+            text: option.addedPrice == null ? null : option.addedPrice.toString(),
+          ),
+          changeHandler: (newVal) => option.setAddedPrice = newVal,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        CustomeSwitchW(
             option1: "available_in_stock".tr(),
             option2: "not_available_in_stock".tr(),
             initValue: stockStatus,
-            changeHandler: (newValue) => option.setNewStockStatus = newValue
-          ),
-          
-          CustomeButton(title: "delete".tr(),icon: FontAwesomeIcons.trash,handler: (){
+            changeHandler: (newValue) => option.setNewStockStatus = newValue),
+        CustomeButton(
+          title: "delete".tr(),
+          icon: FontAwesomeIcons.trash,
+          handler: () {
             deleteHandler(index);
             updateWidget();
-          },)
-
-
-
-    ],);
+          },
+        )
+      ],
+    );
   }
 }
-
-
-
-
-
-
 
 // ignore: must_be_immutable
 class CustomeSwitchW extends StatefulWidget {
@@ -769,17 +751,21 @@ class CustomeSwitchW extends StatefulWidget {
   Color trackColor;
   Color activeColor;
 
-  CustomeSwitchW({this.option1,this.option2,this.changeHandler,this.initValue,
-  this.activeColor = Colors.green ,this.trackColor = Colors.grey });
+  CustomeSwitchW(
+      {this.option1,
+      this.option2,
+      this.changeHandler,
+      this.initValue,
+      this.activeColor = Colors.green,
+      this.trackColor = Colors.grey});
 
   @override
   _CustomeSwitchWState createState() => _CustomeSwitchWState();
 }
 
 class _CustomeSwitchWState extends State<CustomeSwitchW> {
-
   bool initValue;
-  
+
   @override
   void initState() {
     super.initState();
@@ -787,43 +773,37 @@ class _CustomeSwitchWState extends State<CustomeSwitchW> {
       initValue = widget.initValue;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Row(children: [
-              CupertinoSwitch(
-                trackColor: widget.trackColor,
-                activeColor: widget.activeColor,
-                value: initValue,
-                onChanged: (value){
-                  widget.changeHandler(value);
-                  setState(() {
-                    initValue = value;
-                  });
-                },
-              ),
-              SizedBox(
-                width: 15,
-              ),
-              Text(initValue ? widget.option1 : widget.option2)
-            ],
-          ),
-
-          SizedBox(height: 10,),
-
-    ],);
+    return Column(
+      children: [
+        Row(
+          children: [
+            CupertinoSwitch(
+              trackColor: widget.trackColor,
+              activeColor: widget.activeColor,
+              value: initValue,
+              onChanged: (value) {
+                widget.changeHandler(value);
+                setState(() {
+                  initValue = value;
+                });
+              },
+            ),
+            SizedBox(
+              width: 15,
+            ),
+            Text(initValue ? widget.option1 : widget.option2)
+          ],
+        ),
+        SizedBox(
+          height: 10,
+        ),
+      ],
+    );
   }
 }
-
-
-
-
-
-
-
-
-
 
 class CustomeTextField extends StatelessWidget {
   String hintTxt;
@@ -850,7 +830,7 @@ class CustomeTextField extends StatelessWidget {
       obscureText: obscureTextbool,
       validator: validator,
       controller: controller,
-      onChanged: (newVal) => changeHandler(newVal),
+      onChanged: (newVal) => changeHandler?.call(newVal),
       decoration: new InputDecoration(
           hintText: hintTxt,
           labelText: labelTxt,

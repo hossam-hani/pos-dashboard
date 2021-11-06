@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -28,223 +26,228 @@ class GraphDataForSalesAndCosts {
   }
 }
 
-class OrderServices{
-
-
-      static Future<GraphDataForSalesAndCosts> getGraphData(String type)async {
-      
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
-      print(jsonDecode(prefs.getString("account")));
-
-      try {
-        Dio dio = new Dio();
-        dio.options.headers['content-Type'] = 'application/json';
-        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
-
-        Response response = await dio.get("$baseUrl/graph/$type");
-        GraphDataForSalesAndCosts temp = GraphDataForSalesAndCosts.fromJson(response.data);
-        
-        return temp;
-      } catch (e) {
-        print(e);
-      }
-      return null;
-  }
-  
-    static Future<void> createSupplierInvoice({String items, String supplierId,context}) async {
-        
+class OrderServices {
+  static Future<GraphDataForSalesAndCosts> getGraphData(String type) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+    print(jsonDecode(prefs.getString("account")));
 
     try {
-        Dio dio = new Dio();
-        dio.options.headers['content-Type'] = 'application/json';
-        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+      Dio dio = new Dio();
+      dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-      Response response = await dio.post("$baseUrl/order",data: {
-        "shop_id" : currentUser.shop.id.toString(),
-        "items" : items,
-        "supplier_id" : supplierId,
-      },  options: Options(
-            followRedirects: false,
-            validateStatus: (status) {
-              return status < 600;
-            },
-        ),);
-        
-        // Navigator.pop(context);
-        // Navigator.pushNamed(context, '/costs_reports',arguments: {
-        //   "startAt" : null,
-        //   "endAt" : null,
-        //   "type" : null,
-        // });
-      
+      Response response = await dio.get("$baseUrl/graph/$type");
+      GraphDataForSalesAndCosts temp = GraphDataForSalesAndCosts.fromJson(response.data);
+
+      return temp;
     } catch (e) {
       print(e);
     }
     return null;
   }
-  
-  static Future<Order> updateSatus({String orderId, String newStatus}) async {
-        
+
+  static Future<void> createSupplierInvoice({String items, String supplierId, context}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
 
     try {
-        Dio dio = new Dio();
-        dio.options.headers['content-Type'] = 'application/json';
-        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+      Dio dio = new Dio();
+      dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-      Response response = await dio.post("$baseUrl/order/status/$orderId",data: {
-        "status" : newStatus,
-      },  options: Options(
-            followRedirects: false,
-            validateStatus: (status) {
-              return status < 600;
-            },
-        ),);
-      
+      Response response = await dio.post(
+        "$baseUrl/order",
+        data: {
+          "shop_id": currentUser.shop.id.toString(),
+          "items": items,
+          "supplier_id": supplierId,
+        },
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status < 600;
+          },
+        ),
+      );
+
+      // Navigator.pop(context);
+      // Navigator.pushNamed(context, '/costs_reports',arguments: {
+      //   "startAt" : null,
+      //   "endAt" : null,
+      //   "type" : null,
+      // });
+
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<Order> updateSatus({String orderId, String newStatus}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+
+    try {
+      Dio dio = new Dio();
+      dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+
+      Response response = await dio.post(
+        "$baseUrl/order/status/$orderId",
+        data: {
+          "status": newStatus,
+        },
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status < 600;
+          },
+        ),
+      );
+
       return Order.fromJson(response.data);
     } catch (e) {
       print(e);
+      rethrow;
+    }
+  }
+
+  static Future<List<Order>> getOrders(String currentPage, String keyword, String customerID, bool neworder) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+    print(jsonDecode(prefs.getString("account")));
+
+    try {
+      Dio dio = new Dio();
+      dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+
+      Response response;
+      if (neworder) {
+        response = await dio.get("$baseUrl/neworders/?page=$currentPage");
+      } else if (keyword == null && customerID == null) {
+        response = await dio.get("$baseUrl/orders/?page=$currentPage");
+      } else if (keyword != null && customerID == null) {
+        response = await dio.get("$baseUrl/orders/$keyword?page=$currentPage");
+      } else if (keyword == null && customerID != null) {
+        response = await dio.get("$baseUrl/orders/customer/$customerID?page=$currentPage");
+      }
+
+      List<Order> temp = [];
+      print(response.data);
+      response.data["data"].forEach((post) => temp.add(Order.fromJson(post)));
+      return temp;
+    } catch (e) {
+      print(e);
     }
     return null;
   }
 
-  static Future<List<Order>> getOrders(String currentPage,String keyword,String customerID,bool neworder) async {
-      
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
-      print(jsonDecode(prefs.getString("account")));
+  static Future<List<Order>> getOrdersReport(String currentPage,
+      {String startAt,
+      String endAt,
+      String customerId,
+      String supplierId,
+      String userId,
+      bool supplierInvoices}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+    print(jsonDecode(prefs.getString("account")));
 
-      try {
-        Dio dio = new Dio();
-        dio.options.headers['content-Type'] = 'application/json';
-        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+    try {
+      Dio dio = new Dio();
+      dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-        Response response ;
-        if(neworder){
-          response = await dio.get("$baseUrl/neworders/?page=$currentPage");
-        }else if(keyword == null && customerID == null){
-           response = await dio.get("$baseUrl/orders/?page=$currentPage");
-        }else if(keyword != null && customerID == null){
-           response = await dio.get("$baseUrl/orders/$keyword?page=$currentPage");
-        }else if(keyword == null && customerID != null){
-           response = await dio.get("$baseUrl/orders/customer/$customerID?page=$currentPage");
-        }
+      Response response;
+      String url = "$baseUrl/orders/reports?page=$currentPage";
 
-        List<Order> temp = [];
-        print(response.data);
-        response.data["data"].forEach((post) => temp.add(Order.fromJson(post)));
-        return temp;
-      } catch (e) {
-        print(e);
+      if (supplierInvoices != null) {
+        url = url + "&supplier_invoices=1";
       }
-      return null;
+
+      if (supplierId != null) {
+        url = url + "&supplier_id=$supplierId";
+      }
+
+      if (customerId != null) {
+        url = url + "&recipient_id=$customerId";
+      }
+
+      if (startAt != null) {
+        url = url + "&start_at=$startAt";
+      }
+
+      if (endAt != null) {
+        url = url + "&end_at=$endAt";
+      }
+
+      // if(userId != null){
+      //   url = url + "&user_id=$userId";
+      // }
+
+      response = await dio.get(url);
+
+      List<Order> temp = [];
+      print(response.data);
+      response.data["data"].forEach((post) => temp.add(Order.fromJson(post)));
+      return temp;
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 
-    static Future<List<Order>> getOrdersReport(String currentPage
-  ,{String startAt, String endAt,String customerId,String supplierId,String userId, bool supplierInvoices}) async {
-      
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
-      print(jsonDecode(prefs.getString("account")));
+  static Future<String> gerOrdersTotal(String currentPage,
+      {String startAt,
+      String endAt,
+      String customerId,
+      String supplierId,
+      String userId,
+      bool supplierInvoices}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+    print(jsonDecode(prefs.getString("account")));
 
-      try {
-        Dio dio = new Dio();
-        dio.options.headers['content-Type'] = 'application/json';
-        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+    try {
+      Dio dio = new Dio();
+      dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-        Response response ;
-        String url = "$baseUrl/orders/reports?page=$currentPage";
+      Response response;
+      String url = "$baseUrl/orders/reports/total?page=$currentPage";
 
-        
-        if(supplierInvoices != null){
-          url = url + "&supplier_invoices=1";
-        }
-
-        if(supplierId != null){
-          url = url + "&supplier_id=$supplierId";
-        }
-        
-        if(customerId != null){
-          url = url + "&recipient_id=$customerId";
-        }
-
-        if(startAt != null){
-          url = url + "&start_at=$startAt";
-        }
-
-        if(endAt != null){
-          url = url + "&end_at=$endAt";
-        }
-
-        // if(userId != null){
-        //   url = url + "&user_id=$userId";
-        // }
-
-        response = await dio.get(url);
-
-        List<Order> temp = [];
-        print(response.data);
-        response.data["data"].forEach((post) => temp.add(Order.fromJson(post)));
-        return temp;
-      } catch (e) {
-        print(e);
+      if (supplierInvoices != null) {
+        url = url + "&supplier_invoices=1";
       }
-      return null;
-  }
 
-  
-    static Future<String> gerOrdersTotal(String currentPage
-  ,{String startAt, String endAt,String customerId,String supplierId,String userId, bool supplierInvoices}) async {
-      
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
-      print(jsonDecode(prefs.getString("account")));
-
-      try {
-        Dio dio = new Dio();
-        dio.options.headers['content-Type'] = 'application/json';
-        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
-
-        Response response ;
-        String url = "$baseUrl/orders/reports/total?page=$currentPage";
-
-        
-        if(supplierInvoices != null){
-          url = url + "&supplier_invoices=1";
-        }
-
-        if(supplierId != null){
-          url = url + "&supplier_id=$supplierId";
-        }
-
-        if(customerId != null){
-          url = url + "&recipient_id=$customerId";
-        }
-
-        if(startAt != null){
-          url = url + "&start_at=$startAt";
-        }
-
-        if(endAt != null){
-          url = url + "&end_at=$endAt";
-        }
-
-        // if(userId != null){
-        //   url = url + "&user_id=$userId";
-        // }
-
-        response = await dio.get(url);
-
-        return response.data;
-      } catch (e) {
-        print(e);
+      if (supplierId != null) {
+        url = url + "&supplier_id=$supplierId";
       }
-      return null;
+
+      if (customerId != null) {
+        url = url + "&recipient_id=$customerId";
+      }
+
+      if (startAt != null) {
+        url = url + "&start_at=$startAt";
+      }
+
+      if (endAt != null) {
+        url = url + "&end_at=$endAt";
+      }
+
+      // if(userId != null){
+      //   url = url + "&user_id=$userId";
+      // }
+
+      response = await dio.get(url);
+
+      return response.data;
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 }
-
-

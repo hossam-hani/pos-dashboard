@@ -8,7 +8,7 @@ class CustomeButton extends StatelessWidget {
   dynamic handler;
   bool mainColor;
 
-  CustomeButton({this.title,this.icon,this.handler,this.mainColor = false});
+  CustomeButton({this.title, this.icon, this.handler, this.mainColor = false});
 
   @override
   Widget build(BuildContext context) {
@@ -17,30 +17,32 @@ class CustomeButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(3.0),
         child: Container(
-        height: 40.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-            icon == null ? SizedBox() :FaIcon(icon,color: Colors.white),
-            icon == null ? SizedBox() : SizedBox(width: 10,),
-            Text(title.tr(),
-            style: TextStyle(
-            fontSize: 18,
-            color: const Color(0xffffffff),
-            fontWeight: FontWeight.w300,),textAlign: TextAlign.center,
-            ).tr()
-          ],),
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5.0),
-          color:  Color( mainColor ? 0xff1e272e : 0xff000000),
-        ),
+          height: 40.0,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                icon == null ? SizedBox() : FaIcon(icon, color: Colors.white),
+                icon == null ? SizedBox() : SizedBox(width: 10),
+                Text(
+                  title.tr(),
+                  style: TextStyle(
+                    color: const Color(0xffffffff),
+                    fontWeight: FontWeight.w300,
+                  ),
+                  textAlign: TextAlign.center,
+                ).tr()
+              ],
+            ),
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.0),
+            color: Color(mainColor ? 0xff1e272e : 0xff000000),
+          ),
         ),
       ),
     );
   }
-
 }
