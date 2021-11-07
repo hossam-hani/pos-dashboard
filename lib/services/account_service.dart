@@ -167,7 +167,7 @@ class AccountService {
   }
 
   static Future<Account> login({@required String email, @required String password}) async {
-    Response response = await Dio().post("$baseUrl/user/login", data: {
+    final response = await Dio().post("$baseUrl/user/login", data: {
       "email": email,
       "password": password,
     });
@@ -187,7 +187,7 @@ class AccountService {
     dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
     try {
-      Response response = await dio.post("$baseUrl/user/token", data: {
+      await dio.post("$baseUrl/user/token", data: {
         "token": token,
       });
     } catch (e) {

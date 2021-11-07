@@ -10,6 +10,7 @@ import 'package:eckit/services/costs_service.dart';
 import 'package:eckit/services/customer_service.dart';
 import 'package:eckit/services/orders_service.dart';
 import 'package:eckit/services/transactions_service.dart';
+import 'package:eckit/utilties/time_formater.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -44,8 +45,8 @@ class _CustomerListState extends State<CostsReport> {
   final _formKey = GlobalKey<FormState>();
   String totalBalance = '0';
 
-  DateTime startFrom = DateTime.now();
-  DateTime endAt = DateTime.now();
+  DateTime startFrom;
+  DateTime endAt;
   String type;
 
   var loadingKit = Center(
@@ -66,26 +67,25 @@ class _CustomerListState extends State<CostsReport> {
     ),
   );
 
-  search() {
-    Navigator.pop(context);
+  // search() {
+  //   Navigator.pop(context);
 
-    Navigator.pushNamed(context, '/costs_reports', arguments: {
-      "startAt": DateFormat('yyyy-MM-dd').format(startFrom),
-      "endAt": DateFormat('yyyy-MM-dd').format(endAt),
-      "type": type,
-    });
-  }
+  //   Navigator.pushNamed(context, '/costs_reports', arguments: {
+  //     "startAt": DateFormat('yyyy-MM-dd').format(startFrom),
+  //     "endAt": DateFormat('yyyy-MM-dd').format(endAt),
+  //     "type": type,
+  //   });
+  // }
 
   Future<List<Cost>> getOrdersLocal() async {
-    //TODO: fix: returns with status code 500
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
     List<Cost> temp = await CostServices.getCostsReport(
       currentPage.toString(),
       type: widget.type,
-      startAt: widget.startAt,
-      endAt: widget.endAt,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
     );
-
-    log(temp.toString());
 
     setState(() {
       orders = orders.isEmpty ? temp : orders;
@@ -97,11 +97,13 @@ class _CustomerListState extends State<CostsReport> {
   }
 
   getTotalForOrders() async {
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
     String valTemp = await CostServices.gerCostsTotal(
       currentPage.toString(),
       type: widget.type,
-      startAt: widget.startAt,
-      endAt: widget.endAt,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
     );
 
     setState(() {
@@ -117,6 +119,18 @@ class _CustomerListState extends State<CostsReport> {
     super.initState();
     setState(() {
       type = widget.type;
+      isLoading = true;
+    });
+  }
+
+  Future<void> _reloadData() async {
+    setState(() {
+      orders.clear();
+      currentPage = 1;
+      isLoading = false;
+    });
+    await Future.delayed(Duration(milliseconds: 100));
+    setState(() {
       isLoading = true;
     });
   }
@@ -187,7 +201,7 @@ class _CustomerListState extends State<CostsReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                startFrom.toString(),
+                                formateTime(startFrom ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -217,7 +231,7 @@ class _CustomerListState extends State<CostsReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                endAt.toString(),
+                                formateTime(endAt ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -247,8 +261,8 @@ class _CustomerListState extends State<CostsReport> {
                   height: 10,
                 ),
                 CustomeButton(
+                  handler: _reloadData,
                   title: "confirm".tr(),
-                  handler: search,
                 ),
                 Row(
                   children: [

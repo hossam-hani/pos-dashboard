@@ -35,30 +35,30 @@ class _OrderListState extends State<OverView> {
   int currentPage = 1;
   bool isLoading = false;
   TextEditingController keyword = new TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   String link;
   bool isPaid;
 
-  var loadingKit = Center(
+  final loadingKit = Center(
     child: Column(
       children: [
-        SizedBox(
-          height: 20,
-        ),
+        SizedBox(height: 20),
         SpinKitSquareCircle(
           color: mainColor,
           size: 50.0,
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         Text("loading".tr())
       ],
     ),
   );
 
   Future<List<Order>> getProductsLocal() async {
-    List<Order> temp = await OrderServices.getOrders(currentPage.toString(), widget.keyword, widget.customerID, true);
+    List<Order> temp = await OrderServices.getOrders(
+      currentPage.toString(),
+      widget.keyword,
+      widget.customerID,
+      true,
+    );
     setState(() {
       orders = orders.isEmpty ? temp : orders;
       currentPage = currentPage + 1;
@@ -68,7 +68,7 @@ class _OrderListState extends State<OverView> {
     return temp;
   }
 
-  getStoreData() async {
+  Future<void> getStoreData() async {
     Shop shop = await ShopService.getShopDetials();
     setState(() {
       link = shop.link;

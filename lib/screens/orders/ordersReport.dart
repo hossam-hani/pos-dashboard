@@ -1,56 +1,55 @@
-import 'package:eckit/models/account.dart';
-import 'package:eckit/models/address.dart';
-import 'package:eckit/models/customer.dart';
-import 'package:eckit/models/items.dart';
-import 'package:eckit/models/order.dart';
-import 'package:eckit/models/transaction.dart';
-import 'package:eckit/services/account_service.dart';
-import 'package:eckit/services/customer_service.dart';
-import 'package:eckit/services/orders_service.dart';
-import 'package:eckit/services/transactions_service.dart';
-import 'package:eckit/utilties/time_formater.dart';
+import 'dart:developer';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../components/customeButton.dart';
-import 'package:paging/paging.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../models/product.dart';
-import '../../const.dart';
-import 'package:easy_localization/easy_localization.dart';
-
-import '../../validator.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:paging/paging.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
+import 'package:eckit/models/account.dart';
+import 'package:eckit/models/items.dart';
+import 'package:eckit/models/order.dart';
+import 'package:eckit/services/account_service.dart';
+import 'package:eckit/services/orders_service.dart';
+import 'package:eckit/utilties/time_formater.dart';
+
+import '../../components/customeButton.dart';
+import '../../const.dart';
 
 class OrdersReport extends StatefulWidget {
-  String customerId;
-  String startAt;
-  String endAt;
-  String userId;
+  final String customerId;
+  final String startAt;
+  final String endAt;
+  final String userId;
 
-  OrdersReport({this.customerId, this.startAt, this.endAt, this.userId});
+  const OrdersReport({
+    this.customerId,
+    this.startAt,
+    this.endAt,
+    this.userId,
+  });
 
   @override
   _CustomerListState createState() => _CustomerListState();
 }
 
 class _CustomerListState extends State<OrdersReport> {
+  final keyword = TextEditingController();
   List<Order> orders = [];
   int currentPage = 1;
   bool isLoading = false;
-  TextEditingController keyword = new TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   String totalBalance = '0';
 
-  DateTime startFrom = DateTime.now();
-  DateTime endAt = DateTime.now();
+  DateTime startFrom;
+  DateTime endAt;
   User user;
 
   List<User> users;
 
-  var loadingKit = Center(
+  final loadingKit = Center(
     child: Column(
       children: [
         SizedBox(
@@ -68,23 +67,16 @@ class _CustomerListState extends State<OrdersReport> {
     ),
   );
 
-  search() {
-    Navigator.pop(context);
-
-    Navigator.pushNamed(context, '/orders_reports', arguments: {
-      "startAt": DateFormat('yyyy-MM-dd').format(startFrom),
-      "endAt": DateFormat('yyyy-MM-dd').format(endAt),
-      "customerId": null,
-      "userId": user != null ? user.id.toString() : null
-    });
-  }
-
   Future<List<Order>> getOrdersLocal() async {
-    print(widget.startAt);
-    print(widget.endAt);
-
-    List<Order> temp = await OrderServices.getOrdersReport(currentPage.toString(),
-        customerId: widget.customerId, startAt: widget.startAt, endAt: widget.endAt, userId: widget.userId);
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
+    List<Order> temp = await OrderServices.getOrdersReport(
+      currentPage.toString(),
+      customerId: widget.customerId,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
+      userId: user?.id?.toString() ?? widget.userId,
+    );
 
     setState(() {
       orders = orders.isEmpty ? temp : orders;
@@ -95,14 +87,22 @@ class _CustomerListState extends State<OrdersReport> {
     return temp;
   }
 
-  getTotalForOrders() async {
-    String valTemp = await OrderServices.gerOrdersTotal(currentPage.toString(),
-        customerId: widget.customerId, startAt: widget.startAt, endAt: widget.endAt, userId: widget.userId);
+  Future<void> getTotalForOrders() async {
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
+    String valTemp = await OrderServices.gerOrdersTotal(
+      currentPage.toString(),
+      customerId: widget.customerId,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
+      userId: user?.id?.toString() ?? widget.userId,
+    );
 
     List<User> temp = await AccountService.getUsers(currentPage.toString());
 
     setState(() {
       users = temp;
+      log(users.toString());
       totalBalance = valTemp;
     });
   }
@@ -112,7 +112,19 @@ class _CustomerListState extends State<OrdersReport> {
     timeago.setLocaleMessages('ar', timeago.ArMessages());
     getTotalForOrders();
 
+    setState(() {
+      isLoading = true;
+    });
     super.initState();
+  }
+
+  Future<void> _reloadData() async {
+    setState(() {
+      orders.clear();
+      currentPage = 1;
+      isLoading = false;
+    });
+    await Future.delayed(Duration(milliseconds: 100));
     setState(() {
       isLoading = true;
     });
@@ -184,7 +196,7 @@ class _CustomerListState extends State<OrdersReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                startFrom.toString(),
+                                formateDateWithoutTime(startFrom ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -214,7 +226,7 @@ class _CustomerListState extends State<OrdersReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                endAt.toString(),
+                                formateDateWithoutTime(endAt ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -225,7 +237,7 @@ class _CustomerListState extends State<OrdersReport> {
                 SizedBox(
                   height: 10,
                 ),
-                if (user != null)
+                if (users != null)
                   ListTile(
                     leading: Text("المندوب"),
                     title: DropdownButton<User>(
@@ -253,13 +265,8 @@ class _CustomerListState extends State<OrdersReport> {
                       }).toList(),
                     ),
                   ),
-                SizedBox(
-                  height: 10,
-                ),
-                CustomeButton(
-                  title: "confirm".tr(),
-                  handler: search,
-                ),
+                SizedBox(height: 10),
+                CustomeButton(handler: _reloadData, title: "confirm".tr()),
                 ListTile(
                   title: Text("اجمالي الفواتير : ${totalBalance ?? "0"} EGP "),
                 ),

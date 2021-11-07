@@ -47,16 +47,17 @@ class OrderServices {
     return null;
   }
 
-  static Future<void> createSupplierInvoice({String items, String supplierId, context}) async {
+  static Future<void> createSupplierInvoice({String items, String supplierId}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
 
     try {
       Dio dio = new Dio();
       dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers['accept'] = 'application/json';
       dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-      Response response = await dio.post(
+      final response = await dio.post(
         "$baseUrl/order",
         data: {
           "shop_id": currentUser.shop.id.toString(),
@@ -70,18 +71,10 @@ class OrderServices {
           },
         ),
       );
-
-      // Navigator.pop(context);
-      // Navigator.pushNamed(context, '/costs_reports',arguments: {
-      //   "startAt" : null,
-      //   "endAt" : null,
-      //   "type" : null,
-      // });
-
     } catch (e) {
       print(e);
+      rethrow;
     }
-    return null;
   }
 
   static Future<Order> updateSatus({String orderId, String newStatus}) async {
@@ -144,13 +137,15 @@ class OrderServices {
     return null;
   }
 
-  static Future<List<Order>> getOrdersReport(String currentPage,
-      {String startAt,
-      String endAt,
-      String customerId,
-      String supplierId,
-      String userId,
-      bool supplierInvoices}) async {
+  static Future<List<Order>> getOrdersReport(
+    String currentPage, {
+    String startAt,
+    String endAt,
+    String customerId,
+    int supplierId,
+    String userId,
+    bool supplierInvoices,
+  }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
     print(jsonDecode(prefs.getString("account")));
@@ -199,13 +194,15 @@ class OrderServices {
     return null;
   }
 
-  static Future<String> gerOrdersTotal(String currentPage,
-      {String startAt,
-      String endAt,
-      String customerId,
-      String supplierId,
-      String userId,
-      bool supplierInvoices}) async {
+  static Future<String> gerOrdersTotal(
+    String currentPage, {
+    String startAt,
+    String endAt,
+    String customerId,
+    int supplierId,
+    String userId,
+    bool supplierInvoices,
+  }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
     print(jsonDecode(prefs.getString("account")));

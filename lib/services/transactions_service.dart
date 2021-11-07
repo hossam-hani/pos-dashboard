@@ -70,8 +70,12 @@ class TransactionsServices {
     return null;
   }
 
-  static Future<String> getTransactionsCustomersForTotal(String currentPage,
-      {String startAt, String endAt, String customerId}) async {
+  static Future<String> getTransactionsCustomersForTotal(
+    String currentPage, {
+    String startAt,
+    String endAt,
+    String customerId,
+  }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
 

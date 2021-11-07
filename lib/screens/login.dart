@@ -3,6 +3,7 @@ import 'package:eckit/services/account_service.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../validator.dart';
 
@@ -13,8 +14,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController email = new TextEditingController();
-  TextEditingController password = new TextEditingController();
+  TextEditingController email = new TextEditingController(text: 'Abdelbari.h@gmail.com');
+  TextEditingController password = new TextEditingController(text: '35603282');
   bool isLoading = false;
 
   var loadingKit = Center(
@@ -35,14 +36,26 @@ class _LoginState extends State<Login> {
     setState(() {
       isLoading = true;
     });
+    /*
+[02/10, 18:38] Hossam Hani: Abdelbari.h@gmail.com
+[02/10, 18:38] Hossam Hani: 35603282
+    */
 
-    if (_formKey.currentState.validate()) {
-      try {
-        await AccountService.login(email: email.text, password: password.text);
-        Navigator.pushNamed(context, '/home');
-      } catch (e) {
-        // TODO: show error
-      }
+    if (!_formKey.currentState.validate()) return;
+
+    try {
+      await AccountService.login(email: email.text, password: password.text);
+      Navigator.pushNamed(context, '/home');
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "تأكد من البريد او كلمة المرور",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
 
     setState(() {
@@ -61,31 +74,29 @@ class _LoginState extends State<Login> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Center(
-                  child: Image.asset(
-                "assets/images/logo.png",
-                width: 100,
-              )),
-
-              CustomeTextField(
-                controller: email,
-                validator: Validator.notEmpty,
-                hintTxt: "email".tr(),
-                labelTxt: "email_label".tr(),
+              Column(
+                children: [
+                  Center(
+                      child: Image.asset(
+                    "assets/images/logo.png",
+                    width: 100,
+                  )),
+                  CustomeTextField(
+                    controller: email,
+                    validator: Validator.notEmpty,
+                    hintTxt: "email".tr(),
+                    labelTxt: "email_label".tr(),
+                  ),
+                  CustomeTextField(
+                    controller: password,
+                    validator: Validator.notEmpty,
+                    hintTxt: "password_hint".tr(),
+                    labelTxt: "password_label".tr(),
+                    obscureTextbool: true,
+                  ),
+                ],
               ),
-
-              //TODO: validate password
-              //? login if the password is invalid
-              CustomeTextField(
-                controller: password,
-                validator: Validator.notEmpty,
-                hintTxt: "password_hint".tr(),
-                labelTxt: "password_label".tr(),
-                obscureTextbool: true,
-              ),
-
               SizedBox(height: 20),
-
               isLoading
                   ? loadingKit
                   : InkWell(
@@ -110,23 +121,7 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                     ),
-
-              SizedBox(
-                height: 20,
-              ),
-
-              // InkWell(
-              //   onTap: () => Navigator.pushNamed(context, '/'),
-              //   child: Text(
-              //     'create_new_account'.tr(),
-              //     style: TextStyle(
-              //       fontSize: 12,
-              //       color: const Color(0xff514e4e),
-              //       fontWeight: FontWeight.bold,
-              //     ),
-              //     textAlign: TextAlign.left,
-              //   ),
-              // )
+              SizedBox(height: 20),
             ],
           ),
         ),

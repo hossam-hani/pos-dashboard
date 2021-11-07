@@ -27,12 +27,17 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:intl/intl.dart';
 
 class VstistsReport extends StatefulWidget {
-  String customerId;
-  String startAt;
-  String endAt;
-  String userId;
+  final String customerId;
+  final String startAt;
+  final String endAt;
+  final String userId;
 
-  VstistsReport({this.customerId, this.startAt, this.endAt, this.userId});
+  const VstistsReport({
+    this.customerId,
+    this.startAt,
+    this.endAt,
+    this.userId,
+  });
 
   @override
   _VstistsListState createState() => _VstistsListState();
@@ -42,48 +47,46 @@ class _VstistsListState extends State<VstistsReport> {
   List<Visit> orders = [];
   int currentPage = 1;
   bool isLoading = false;
-  TextEditingController keyword = new TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  final keyword = TextEditingController();
   String totalBalance = '0';
 
-  DateTime startFrom = DateTime.now();
-  DateTime endAt = DateTime.now();
+  DateTime startFrom;
+  DateTime endAt;
   User user;
 
   List<User> users;
 
-  var loadingKit = Center(
+  final loadingKit = Center(
     child: Column(
       children: [
-        SizedBox(
-          height: 20,
-        ),
-        SpinKitSquareCircle(
-          color: mainColor,
-          size: 50.0,
-        ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 20),
+        SpinKitSquareCircle(color: mainColor, size: 50.0),
+        SizedBox(height: 10),
         Text("loading".tr())
       ],
     ),
   );
 
-  search() {
-    Navigator.pop(context);
-
-    Navigator.pushNamed(context, '/vstists_reports', arguments: {
-      "startAt": DateFormat('yyyy-MM-dd').format(startFrom),
-      "endAt": DateFormat('yyyy-MM-dd').format(endAt),
-      "customerId": null,
-      "userId": user != null ? user.id.toString() : null
-    });
-  }
+  // search() {
+  //   Navigator.pop(context);
+  //   Navigator.pushNamed(context, '/vstists_reports', arguments: {
+  //     "startAt": DateFormat('yyyy-MM-dd').format(startFrom),
+  //     "endAt": DateFormat('yyyy-MM-dd').format(endAt),
+  //     "customerId": null,
+  //     "userId": user != null ? user.id.toString() : null
+  //   });
+  // }
 
   Future<List<Visit>> getVisitsLocal() async {
-    List<Visit> temp = await VisitsServices.getVisitsReport(currentPage.toString(),
-        customerId: widget.customerId, startAt: widget.startAt, endAt: widget.endAt, userId: widget.userId);
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
+    List<Visit> temp = await VisitsServices.getVisitsReport(
+      currentPage.toString(),
+      customerId: widget.customerId,
+      userId: user?.id?.toString() ?? widget.userId,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
+    );
 
     setState(() {
       orders = orders.isEmpty ? temp : orders;
@@ -95,19 +98,22 @@ class _VstistsListState extends State<VstistsReport> {
   }
 
   getTotalForOrders() async {
-    // String valTemp = await OrderServices.gerOrdersTotal(
-    //   currentPage.toString(),
-    //   customerId: widget.customerId,
-    //   startAt: widget.startAt,
-    //   endAt: widget.endAt,
-    //   userId: widget.userId
-    // );
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
+
+    final valTemp = await OrderServices.gerOrdersTotal(
+      currentPage.toString(),
+      customerId: widget.customerId,
+      userId: user?.id?.toString() ?? widget.userId,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
+    );
 
     List<User> temp = await AccountService.getUsers(currentPage.toString());
 
     setState(() {
       users = temp;
-      // totalBalance = valTemp;
+      totalBalance = valTemp;
     });
   }
 
@@ -117,6 +123,18 @@ class _VstistsListState extends State<VstistsReport> {
     getTotalForOrders();
 
     super.initState();
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+  Future<void> _reloadData() async {
+    setState(() {
+      orders.clear();
+      currentPage = 1;
+      isLoading = false;
+    });
+    await Future.delayed(Duration(milliseconds: 100));
     setState(() {
       isLoading = true;
     });
@@ -161,9 +179,7 @@ class _VstistsListState extends State<VstistsReport> {
                     )
                   ],
                 ),
-
                 Divider(),
-
                 Row(
                   children: [
                     Expanded(
@@ -190,7 +206,7 @@ class _VstistsListState extends State<VstistsReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                formateDateWithoutTime(startFrom),
+                                formateDateWithoutTime(startFrom ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -220,7 +236,7 @@ class _VstistsListState extends State<VstistsReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                formateDateWithoutTime(endAt),
+                                formateDateWithoutTime(endAt ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -228,10 +244,7 @@ class _VstistsListState extends State<VstistsReport> {
                     ),
                   ],
                 ),
-
                 SizedBox(height: 10),
-
-                //TODO: Agent selector doesn't work
                 if (users != null)
                   ListTile(
                     leading: Text("المندوب"),
@@ -260,20 +273,9 @@ class _VstistsListState extends State<VstistsReport> {
                       }).toList(),
                     ),
                   ),
-
-                SizedBox(
-                  height: 10,
-                ),
-
-                CustomeButton(
-                  title: "confirm".tr(),
-                  handler: search,
-                ),
-
-                // ListTile(
-                //   title: Text("اجمالي الفواتير : ${totalBalance ?? "0"} EGP "),
-                // ),
-
+                SizedBox(height: 10),
+                CustomeButton(handler: _reloadData, title: "confirm".tr()),
+                ListTile(title: Text("اجمالي الفواتير : ${totalBalance ?? "0"} EGP ")),
                 orders.isEmpty && !isLoading ? ProductPlaceholder() : SizedBox(),
                 orders.isEmpty && !isLoading
                     ? SizedBox()

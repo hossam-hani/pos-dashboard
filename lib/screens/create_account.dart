@@ -11,9 +11,7 @@ class CreateAccount extends StatefulWidget {
 }
 
 class _CreateAccountState extends State<CreateAccount> {
-
   createNewUserAccount() async {
-    
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String name = prefs.getString("name");
     String email = prefs.getString("email");
@@ -26,35 +24,58 @@ class _CreateAccountState extends State<CreateAccount> {
     String password = prefs.getString("password");
     String category = prefs.getString("category");
 
-    await AccountService.createAccount(storeName: storeName,country: country,
-    currency: curreny,category: category,password: password,name: name,email: email,phone: code+phone,link: storeLink);
-    
-    //TODO: unset strings keys 
+    await AccountService.createAccount(
+        storeName: storeName,
+        country: country,
+        currency: curreny,
+        category: category,
+        password: password,
+        name: name,
+        email: email,
+        phone: code + phone,
+        link: storeLink);
+
+    //TODO: unset strings keys
     Navigator.pushReplacementNamed(context, '/home');
-
   }
-
 
   @override
   void initState() {
     super.initState();
     createNewUserAccount();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-      padding: const EdgeInsets.all(30.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-        Center(child: Image.asset("assets/images/logo.png" , width: 150,)),
-        SizedBox(height: 35,),
-        Text('wait_until_finish'.tr(),textAlign: TextAlign.center,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w100),).tr(),
-        Text('intro_des'.tr(),textAlign: TextAlign.center,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w100,color: mainColor),).tr(),
-      ],),
-    ),);
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+                child: Image.asset(
+              "assets/images/logo.png",
+              width: 150,
+            )),
+            SizedBox(
+              height: 35,
+            ),
+            Text(
+              'wait_until_finish'.tr(),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100),
+            ).tr(),
+            Text(
+              'intro_des'.tr(),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100, color: mainColor),
+            ).tr(),
+          ],
+        ),
+      ),
+    );
   }
 }

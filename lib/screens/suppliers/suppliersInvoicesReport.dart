@@ -46,8 +46,8 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
   final _formKey = GlobalKey<FormState>();
   String totalBalance = '0';
 
-  DateTime startFrom = DateTime.now();
-  DateTime endAt = DateTime.now();
+  DateTime startFrom;
+  DateTime endAt;
   Supplier supplier;
 
   List<Supplier> suppliers;
@@ -70,28 +70,18 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
     ),
   );
 
-  search() {
-    Navigator.pop(context);
-
-    Navigator.pushNamed(context, '/suppliers_invoices', arguments: {
-      "startAt": DateFormat('yyyy-MM-dd').format(startFrom),
-      "endAt": DateFormat('yyyy-MM-dd').format(endAt),
-      "supplierId": supplier != null ? supplier.id.toString() : null,
-    });
-
-    print(supplier.id);
-  }
-
   Future<List<Order>> getOrdersLocal() async {
-    print("=========================== ${widget.supplierId}");
-
-    List<Order> temp = await OrderServices.getOrdersReport(currentPage.toString(),
-        customerId: null,
-        startAt: widget.startAt,
-        endAt: widget.endAt,
-        userId: null,
-        supplierInvoices: true,
-        supplierId: widget.supplierId);
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
+    List<Order> temp = await OrderServices.getOrdersReport(
+      currentPage.toString(),
+      customerId: null,
+      userId: null,
+      supplierInvoices: true,
+      supplierId: supplier?.id ?? widget.supplierId,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
+    );
 
     setState(() {
       orders = orders.isEmpty ? temp : orders;
@@ -102,16 +92,18 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
     return temp;
   }
 
-  getTotalForOrders() async {
-    print("=========================== ${widget.supplierId}");
-
-    String valTemp = await OrderServices.gerOrdersTotal(currentPage.toString(),
-        customerId: null,
-        startAt: widget.startAt,
-        endAt: widget.endAt,
-        userId: null,
-        supplierInvoices: true,
-        supplierId: widget.supplierId);
+  Future<void> getTotalForOrders() async {
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
+    String valTemp = await OrderServices.gerOrdersTotal(
+      currentPage.toString(),
+      customerId: null,
+      userId: null,
+      supplierInvoices: true,
+      supplierId: supplier?.id ?? widget.supplierId,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
+    );
 
     List<Supplier> temp = await SuppliersServices.getAllSuppliers();
 
@@ -127,6 +119,18 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
     getTotalForOrders();
 
     super.initState();
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+  Future<void> _reloadData() async {
+    setState(() {
+      orders.clear();
+      currentPage = 1;
+      isLoading = false;
+    });
+    await Future.delayed(Duration(milliseconds: 100));
     setState(() {
       isLoading = true;
     });
@@ -198,7 +202,7 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                formateDateWithoutTime(startFrom),
+                                formateDateWithoutTime(startFrom ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -228,7 +232,7 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                formateDateWithoutTime(endAt),
+                                formateDateWithoutTime(endAt ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -271,8 +275,10 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
                   height: 10,
                 ),
                 CustomeButton(
+                  handler: () {
+                    _reloadData();
+                  },
                   title: "confirm".tr(),
-                  handler: search,
                 ),
                 ListTile(
                   title: Text("اجمالي الفواتير : ${totalBalance ?? "0"} EGP "),

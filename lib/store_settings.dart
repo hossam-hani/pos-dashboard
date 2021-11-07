@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:eckit/components/customeButton.dart';
@@ -235,13 +234,13 @@ class _StoreSettingsState extends State<StoreSettings> {
               Expanded(
                 child: CustomeButton(
                   title: "التكاليف",
-                  handler: () async {},
-                ),
-              ),
-              Expanded(
-                child: CustomeButton(
-                  title: "الإرباح",
-                  handler: () async {},
+                  handler: () {
+                    Navigator.pushNamed(context, '/costs_reports', arguments: {
+                      "startAt": null,
+                      "endAt": null,
+                      "type": null,
+                    });
+                  },
                 ),
               ),
             ],
@@ -259,15 +258,6 @@ class _StoreSettingsState extends State<StoreSettings> {
           CustomeButton(
             title: "edit_store_settings".tr(),
             handler: () => {Navigator.pushNamed(context, '/edit_shop_details')},
-          ),
-
-          CustomeButton(
-            title: "logout".tr(),
-            handler: () async {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.remove("account");
-              Navigator.pushNamed(context, '/login');
-            },
           ),
 
           Row(

@@ -34,50 +34,36 @@ class TransactionsReport extends StatefulWidget {
 }
 
 class _CustomerListState extends State<TransactionsReport> {
+  final keyword = TextEditingController();
   List<Transaction> transctions = [];
   int currentPage = 1;
   bool isLoading = false;
-  TextEditingController keyword = new TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   String totalBalance = '0';
 
-  DateTime startFrom = DateTime.now();
-  DateTime endAt = DateTime.now();
+  DateTime startFrom;
+  DateTime endAt;
 
-  var loadingKit = Center(
+  final loadingKit = Center(
     child: Column(
       children: [
-        SizedBox(
-          height: 20,
-        ),
-        SpinKitSquareCircle(
-          color: mainColor,
-          size: 50.0,
-        ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 20),
+        SpinKitSquareCircle(color: mainColor, size: 50.0),
+        SizedBox(height: 10),
         Text("loading".tr())
       ],
     ),
   );
 
-  search() {
-    Navigator.pop(context);
-
-    Navigator.pushNamed(context, '/transactions_reports', arguments: {
-      "startAt": DateFormat('yyyy-MM-dd').format(startFrom),
-      "endAt": DateFormat('yyyy-MM-dd').format(endAt),
-      "customerId": null,
-    });
-  }
-
   Future<List<Transaction>> getTransctionsLocal() async {
-    print(widget.startAt);
-    print(widget.endAt);
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
 
-    List<Transaction> temp = await TransactionsServices.getTransactionsForCustomers(currentPage.toString(),
-        customerId: widget.customerId, startAt: widget.startAt, endAt: widget.endAt);
+    List<Transaction> temp = await TransactionsServices.getTransactionsForCustomers(
+      currentPage.toString(),
+      customerId: widget.customerId,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
+    );
 
     setState(() {
       transctions = transctions.isEmpty ? temp : transctions;
@@ -89,8 +75,15 @@ class _CustomerListState extends State<TransactionsReport> {
   }
 
   getBalanceOfCustomer() async {
-    String valTemp = await TransactionsServices.getTransactionsCustomersForTotal(currentPage.toString(),
-        customerId: widget.customerId, startAt: widget.startAt, endAt: widget.endAt);
+    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
+
+    String valTemp = await TransactionsServices.getTransactionsCustomersForTotal(
+      currentPage.toString(),
+      customerId: widget.customerId,
+      startAt: _startAt ?? widget.startAt,
+      endAt: _endAt ?? widget.endAt,
+    );
 
     setState(() {
       totalBalance = valTemp;
@@ -102,7 +95,17 @@ class _CustomerListState extends State<TransactionsReport> {
     timeago.setLocaleMessages('ar', timeago.ArMessages());
     getBalanceOfCustomer();
 
+    setState(() => isLoading = true);
     super.initState();
+  }
+
+  Future<void> _reloadData() async {
+    setState(() {
+      transctions.clear();
+      currentPage = 1;
+      isLoading = false;
+    });
+    await Future.delayed(Duration(milliseconds: 100));
     setState(() {
       isLoading = true;
     });
@@ -174,7 +177,7 @@ class _CustomerListState extends State<TransactionsReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                formateDateWithoutTime(startFrom),
+                                formateDateWithoutTime(startFrom ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -204,7 +207,7 @@ class _CustomerListState extends State<TransactionsReport> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                               Text(
-                                formateDateWithoutTime(endAt),
+                                formateDateWithoutTime(endAt ?? DateTime.now()),
                                 style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                               )
                             ],
@@ -216,8 +219,8 @@ class _CustomerListState extends State<TransactionsReport> {
                   height: 10,
                 ),
                 CustomeButton(
+                  handler: _reloadData,
                   title: "confirm".tr(),
-                  handler: search,
                 ),
                 ListTile(
                   title: Text("اجمالي السندات : ${totalBalance ?? "0"} EGP "),
@@ -308,7 +311,6 @@ class ListItem extends StatelessWidget {
                   ),
                   textAlign: TextAlign.left,
                 ),
-
                 Text(
                   'اسم العميل : $customerName',
                   style: TextStyle(
@@ -318,7 +320,6 @@ class ListItem extends StatelessWidget {
                   ),
                   textAlign: TextAlign.left,
                 ),
-
                 Text(
                   'المبلغ : $amount جنيه',
                   style: TextStyle(
@@ -328,7 +329,6 @@ class ListItem extends StatelessWidget {
                   ),
                   textAlign: TextAlign.left,
                 ),
-
                 Text(
                   'البيان : $reason',
                   style: TextStyle(
@@ -338,11 +338,7 @@ class ListItem extends StatelessWidget {
                   ),
                   textAlign: TextAlign.left,
                 ),
-
-                Divider(),
-
-                //TODO: formate the date [in progress]
-
+                const Divider(),
                 Text(
                   'التوقيت : ${formateStringTime(date)}',
                   style: TextStyle(
@@ -353,7 +349,6 @@ class ListItem extends StatelessWidget {
                   ),
                   textAlign: TextAlign.left,
                 ),
-
                 SizedBox(
                   height: 5,
                 ),

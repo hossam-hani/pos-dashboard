@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -27,47 +26,47 @@ import '../../validator.dart';
 import '../../models/region.dart';
 import '../../services/regions_service.dart';
 
+//TODO: fix add supplier invoice
+
 // ignore: must_be_immutable
 class SupplierInvoiceEditor extends StatefulWidget {
-
-
   SupplierInvoiceEditor();
 
   @override
   _SupplierInvoiceEditorState createState() => _SupplierInvoiceEditorState();
 }
 
-
 class _SupplierInvoiceEditorState extends State<SupplierInvoiceEditor> {
-  
-   final _formKey = GlobalKey<FormState>();
-   TextEditingController cost = new TextEditingController();
-   TextEditingController quantity = new TextEditingController();
-   String type;
-   Store fromStore;
-   Product currentProduct;
-   List<Supplier> suppliers;
-   Supplier currentSupplier;
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController cost = new TextEditingController();
+  TextEditingController quantity = new TextEditingController();
+  String type;
+  Store fromStore;
+  Product currentProduct;
+  List<Supplier> suppliers;
+  Supplier currentSupplier;
 
-   bool isLoading = false;
+  bool isLoading = false;
 
-   List<Store> stores;
+  List<Store> stores;
 
-   List<dynamic> items = [];
+  List<dynamic> items = [];
 
-    var loadingKit = Center(
-        child: Column(children: [
-          SizedBox(height: 20,),
-          SpinKitSquareCircle(
+  var loadingKit = Center(
+    child: Column(
+      children: [
+        SizedBox(
+          height: 20,
+        ),
+        SpinKitSquareCircle(
           color: Colors.white,
           size: 50.0,
         ),
-        ],),
-      );
- 
+      ],
+    ),
+  );
 
   save() async {
-
     setState(() {
       isLoading = true;
     });
@@ -76,68 +75,70 @@ class _SupplierInvoiceEditorState extends State<SupplierInvoiceEditor> {
 
     items.forEach((element) {
       itemsec.add({
-        "id" : element["product"].id.toString(),
-        "quantity" : element["quantity"],
-        "notes" : null,
-        "inventory_id" : element["inventory"].id.toString(),
-        "cost" : element["cost"].toString(),
+        "id": element["product"].id.toString(),
+        "quantity": element["quantity"],
+        "notes": null,
+        "inventory_id": element["inventory"].id.toString(),
+        "cost": element["cost"].toString(),
       });
     });
 
     if (_formKey.currentState.validate()) {
-      await OrderServices.createSupplierInvoice(
-        items: jsonEncode(itemsec),
-        supplierId: currentSupplier.id.toString(),
-        context: context
+      try {
+        await OrderServices.createSupplierInvoice(
+          items: jsonEncode(itemsec),
+          supplierId: currentSupplier.id.toString(),
         );
+        Navigator.pop(context);
+      } catch (e) {
+        /* do nothing */
+      }
     }
 
     setState(() {
       isLoading = false;
     });
-
   }
 
   initValues() async {
-  
-  setState(() {
+    setState(() {
       isLoading = true;
-  });
+    });
 
-  List<Store> temp = await StoreServices.getAllStores();
-  List<Supplier> tempSuppliers = await SuppliersServices.getAllSuppliers();
+    List<Store> temp = await StoreServices.getAllStores();
+    List<Supplier> tempSuppliers = await SuppliersServices.getAllSuppliers();
 
-  setState(() {
+    setState(() {
       stores = temp;
       suppliers = tempSuppliers;
       isLoading = false;
-  });
-
+    });
   }
 
   @override
   void initState() {
-    super.initState();
     initValues();
+    super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar:  InkWell(
+      bottomNavigationBar: InkWell(
         onTap: save,
-          child: Container(
+        child: Container(
           child: Center(
-            child: isLoading ? loadingKit : Text(
-              "save".tr(),
-              style: TextStyle(
-                fontSize: 20,
-                color: const Color(0xffffffff),
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.left,
-            ),
+            child: isLoading
+                ? loadingKit
+                : Text(
+                    "save".tr(),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: const Color(0xffffffff),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
           ),
           height: 80.0,
           decoration: BoxDecoration(
@@ -151,118 +152,115 @@ class _SupplierInvoiceEditorState extends State<SupplierInvoiceEditor> {
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           leading: new IconButton(
-          icon: FaIcon(FontAwesomeIcons.arrowRight,color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-          title: Image.asset("assets/images/logo.png" , height: 40,)
-        ),
-        backgroundColor: Colors.white,
-        body: isLoading ? loadingKit : SingleChildScrollView(
+            icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Image.asset(
+            "assets/images/logo.png",
+            height: 40,
+          )),
+      backgroundColor: Colors.white,
+      body: isLoading
+          ? loadingKit
+          : SingleChildScrollView(
               child: Form(
-              key: _formKey,
-              child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                Padding(
+                key: _formKey,
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child:   Text("إنشاء فاتورة مورد جديدة",
-                    style: TextStyle(  
-                      fontSize: 20,
-                      color: const Color(0xff000000),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,  
-                  ),
-                ),
-
-              isLoading ? Text("loading") : Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownButton<Supplier>(
-                    value: currentSupplier,
-                    isExpanded: true,
-                    items: suppliers.map((Supplier supplier) {
-                      return new DropdownMenuItem<Supplier>(
-                        value: supplier,
-                        child: new Text(supplier.name),
-                      );
-                    }).toList(),
-                    hint: Text("select_supplier_hint".tr()),
-                    onChanged: (newValue) {
-                      setState(() {
-                        currentSupplier = newValue;
-                      });
-                    },
-                  ),
-              ),
-
-
-
-              Divider(color: Colors.black,),
-
-                
-              Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child:   Text("الفاتورة",
-                    style: TextStyle(  
-                      fontSize: 20,
-                      color: const Color(0xff000000),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,  
-                  ),
-              ),
-
-
-              Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownSearch<Product>(
-                    mode: Mode.MENU,
-                    showSearchBox: true,
-                    itemAsString: (Product u) => u.name.toString(),
-                    label: "product".tr(),
-                    hint: "select_product_hint".tr(),
-                    isFilteredOnline : true,
-                    onFind: (String filter) => ProductServices.productsSearch(filter),
-                    onChanged: (Product data) {
-                      setState(() {
-                        currentProduct = data;
-                      });
-                    },
-                  ),
-                ),
-
-
-              Row(children: [
-
-                Expanded(
-                  child: CustomeTextField(
-                      controller:  quantity,
-                      hintTxt: "ادخل الكمية".tr(),
-                      labelTxt: "الكمية".tr(),
-                    ),
-                ),
-
-                SizedBox(width: 10,),
-
-                Expanded(
-                  child: CustomeTextField(
-                      controller:  cost,
-                      hintTxt: "ادخل التكلفة".tr(),
-                      labelTxt: "التكلفة".tr(),
-                    ),
-                ),
-
-
-              ],),
-
-              ListTile(
-                          leading: Text("الي مخزن"),
-                          title: DropdownButton<Store>(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "إنشاء فاتورة مورد جديدة",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: const Color(0xff000000),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      isLoading
+                          ? Text("loading")
+                          : Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButton<Supplier>(
+                                value: currentSupplier,
+                                isExpanded: true,
+                                items: suppliers.map((Supplier supplier) {
+                                  return new DropdownMenuItem<Supplier>(
+                                    value: supplier,
+                                    child: new Text(supplier.name),
+                                  );
+                                }).toList(),
+                                hint: Text("select_supplier_hint".tr()),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    currentSupplier = newValue;
+                                  });
+                                },
+                              ),
+                            ),
+                      Divider(
+                        color: Colors.black,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "الفاتورة",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: const Color(0xff000000),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DropdownSearch<Product>(
+                          mode: Mode.MENU,
+                          showSearchBox: true,
+                          itemAsString: (Product u) => u.name.toString(),
+                          label: "product".tr(),
+                          hint: "select_product_hint".tr(),
+                          isFilteredOnline: true,
+                          onFind: (String filter) => ProductServices.productsSearch(filter),
+                          onChanged: (Product data) {
+                            setState(() {
+                              currentProduct = data;
+                            });
+                          },
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomeTextField(
+                              controller: quantity,
+                              hintTxt: "ادخل الكمية".tr(),
+                              labelTxt: "الكمية".tr(),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: CustomeTextField(
+                              controller: cost,
+                              hintTxt: "ادخل التكلفة".tr(),
+                              labelTxt: "التكلفة".tr(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      ListTile(
+                        leading: Text("الي مخزن"),
+                        title: DropdownButton<Store>(
                           value: fromStore,
                           isExpanded: true,
                           hint: Text("اختر المخزن الذي الإضافة إليه"),
@@ -279,91 +277,84 @@ class _SupplierInvoiceEditorState extends State<SupplierInvoiceEditor> {
                               fromStore = newValue;
                             });
                           },
-                          items: stores
-                              .map<DropdownMenuItem<Store>>((Store store) {
+                          items: stores.map<DropdownMenuItem<Store>>((Store store) {
                             return DropdownMenuItem<Store>(
                               value: store,
                               child: Text(store.name.toString()),
                             );
                           }).toList(),
                         ),
-                  ),
-
-              CustomeButton(title: "إضافة الي الفاتورة"
-              ,icon: FontAwesomeIcons.plus,handler: (){
-                setState(() {
-                  items.add({
-                    "product" : currentProduct,
-                    "cost" : cost.text,
-                    "quantity" : quantity.text,
-                    "inventory" : fromStore
-                  });
-                  cost.clear();
-                  quantity.clear();
-                  fromStore = null;
-                  });
-
-                  print(items);
-              },),
-
-
-              ... items.map(
-                (item) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Row(children: [
-                        Expanded(
-                          child: Text(
-                          "${item["product"].name.toString()}  * ${item["quantity"]}  |  ${item["inventory"].name} ",
-                          style: TextStyle(fontSize: 18,fontFamily: "Lato"),
-                          ),
-                        ),
-
-                        Text(
-                        "${item["cost"]}",
-                        style: TextStyle(fontSize: 18,fontFamily: "Lato"),
-                        ),
-                        
-                        SizedBox(width: 10,),
-                        InkWell(
-                          onTap: (){
-                            setState(() {
-                              items.remove(item);
+                      ),
+                      CustomeButton(
+                        title: "إضافة الي الفاتورة",
+                        icon: FontAwesomeIcons.plus,
+                        handler: () {
+                          setState(() {
+                            items.add({
+                              "product": currentProduct,
+                              "cost": cost.text,
+                              "quantity": quantity.text,
+                              "inventory": fromStore
                             });
-                          },
-                          child: FaIcon(FontAwesomeIcons.trash,color: Colors.red,)
-                          )
+                            cost.clear();
+                            quantity.clear();
+                            fromStore = null;
+                          });
 
-                      ],),
-                      Divider(color: Colors.black)
+                          print(items);
+                        },
+                      ),
+                      ...items
+                          .map((item) => Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "${item["product"].name.toString()}  * ${item["quantity"]}  |  ${item["inventory"].name} ",
+                                            style: TextStyle(fontSize: 18, fontFamily: "Lato"),
+                                          ),
+                                        ),
+                                        Text(
+                                          "${item["cost"]}",
+                                          style: TextStyle(fontSize: 18, fontFamily: "Lato"),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                items.remove(item);
+                                              });
+                                            },
+                                            child: FaIcon(
+                                              FontAwesomeIcons.trash,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                    Divider(color: Colors.black)
+                                  ],
+                                ),
+                              ))
+                          .toList(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
                     ],
                   ),
-                )
-                ).toList(),
-
-
-
-
-  
-
-                SizedBox(height: 10,),
-
-   
-             
-
-
-
-               SizedBox(height: 20,),
-                
-              ],),
+                ),
+              ),
             ),
-          ),
-        ),
     );
   }
 }
-
 
 class CustomeTextField extends StatelessWidget {
   String hintTxt;
@@ -372,27 +363,26 @@ class CustomeTextField extends StatelessWidget {
   dynamic validator;
   bool obscureTextbool;
 
-  CustomeTextField({this.hintTxt,this.labelTxt,this.controller,this.validator,this.obscureTextbool = false});
+  CustomeTextField({this.hintTxt, this.labelTxt, this.controller, this.validator, this.obscureTextbool = false});
 
   @override
   Widget build(BuildContext context) {
-    return  TextFormField(
-            obscureText: obscureTextbool,
-            validator: validator,
-            controller: controller,
-            decoration: new InputDecoration(
-              hintText: hintTxt,
-              labelText: labelTxt,
-                enabledBorder: UnderlineInputBorder(      
-                borderSide: BorderSide(color: Color(0xFFECDFDF)),   
-              ),  
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFECDFDF)),
-              ),
-              border: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFECDFDF)),
-              )
-                  ),
-            );
+    return TextFormField(
+      obscureText: obscureTextbool,
+      validator: validator,
+      controller: controller,
+      decoration: new InputDecoration(
+          hintText: hintTxt,
+          labelText: labelTxt,
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFECDFDF)),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFECDFDF)),
+          ),
+          border: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFECDFDF)),
+          )),
+    );
   }
 }

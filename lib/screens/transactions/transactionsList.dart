@@ -8,6 +8,7 @@ import 'package:eckit/services/customer_service.dart';
 import 'package:eckit/services/stocks_service.dart';
 import 'package:eckit/services/suppliers_service.dart';
 import 'package:eckit/services/transactions_service.dart';
+import 'package:eckit/utilties/time_formater.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import '../../services/regions_service.dart';
@@ -57,19 +58,12 @@ class _TransactionsListState extends State<TransactionsList> {
   int currentPage = 1;
   bool isLoading = false;
 
-  var loadingKit = Center(
+  final loadingKit = Center(
     child: Column(
       children: [
-        SizedBox(
-          height: 20,
-        ),
-        SpinKitSquareCircle(
-          color: mainColor,
-          size: 50.0,
-        ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 20),
+        SpinKitSquareCircle(size: 50.0, color: mainColor),
+        SizedBox(height: 10),
         Text("loading".tr())
       ],
     ),
@@ -82,11 +76,6 @@ class _TransactionsListState extends State<TransactionsList> {
   }
 
   search() {
-    print(startFrom);
-    print(endAt);
-    print(_isCustomer ? "customer" : "supplier");
-    print(_isCustomer ? currentCustomer.id : currentSupplier.id);
-
     Navigator.pushNamed(context, '/transactions', arguments: {
       "startAt": startFrom,
       "endAt": endAt,
@@ -96,7 +85,9 @@ class _TransactionsListState extends State<TransactionsList> {
   }
 
   Future<List<Transaction>> getStocksLocal() async {
-    List<Transaction> temp = await TransactionsServices.getTransactions(currentPage.toString());
+    List<Transaction> temp = await TransactionsServices.getTransactions(
+      currentPage.toString(),
+    );
 
     setState(() {
       transactions = transactions.isEmpty ? temp : transactions;
@@ -233,7 +224,7 @@ class _TransactionsListState extends State<TransactionsList> {
                                       style: TextStyle(color: Colors.blue),
                                     ),
                                     Text(
-                                      startFrom.toString(),
+                                      formateDateWithoutTime(startFrom),
                                       style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                                     )
                                   ],
@@ -263,7 +254,7 @@ class _TransactionsListState extends State<TransactionsList> {
                                       style: TextStyle(color: Colors.blue),
                                     ),
                                     Text(
-                                      endAt.toString(),
+                                      formateDateWithoutTime(endAt),
                                       style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
                                     )
                                   ],

@@ -115,7 +115,7 @@ class CostServices {
     } catch (e) {
       log(e.toString());
     }
-    return null;
+    return [];
   }
 
   static Future<String> gerCostsTotal(String currentPage, {String startAt, String endAt, String type}) async {
