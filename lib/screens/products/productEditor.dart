@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:eckit/components/customeButton.dart';
 import 'package:eckit/models/Attribute.dart';
@@ -15,6 +14,7 @@ import 'package:eckit/models/option.dart';
 import 'package:eckit/models/product.dart';
 import 'package:eckit/services/categories_service.dart';
 import 'package:eckit/services/product_service.dart';
+import 'package:eckit/utilities/image_picker.dart';
 
 import '../../validator.dart';
 
@@ -62,7 +62,6 @@ class _ProductEditorState extends State<ProductEditor> {
   ];
 
   //  File _image;
-  final picker = ImagePicker();
   //  List<Asset> images = new List<Asset>();
 
   List<Category> categories;
@@ -83,20 +82,13 @@ class _ProductEditorState extends State<ProductEditor> {
     ),
   );
 
-  Future<File> getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+  Future<void> getImage() async {
+    final pickedFile = await AppImagePicker().pickImageFile();
 
-    if (pickedFile != null) {
-      return File(pickedFile.path);
-    } else {
-      print('No image selected.');
-    }
-  }
+    if (pickedFile == null) return;
 
-  addnewImageToList() async {
-    File temp = await getImage();
     setState(() {
-      images.add(temp);
+      images.add(pickedFile);
     });
   }
 
@@ -115,7 +107,6 @@ class _ProductEditorState extends State<ProductEditor> {
       }
 
       try {
-        //TODO: [Issue] product can't be saved
         final product = widget.productArgs?.product;
         await ProductServices.saveProduct(
           name: name.text,
@@ -424,10 +415,10 @@ class _ProductEditorState extends State<ProductEditor> {
                       images.length != 0
                           ? Padding(
                               padding: const EdgeInsets.symmetric(vertical: 15),
-                              child: FlatButton(onPressed: addnewImageToList, child: Text("اختر المزيد من الصور")),
+                              child: FlatButton(onPressed: getImage, child: Text("اختر المزيد من الصور")),
                             )
                           : InkWell(
-                              onTap: addnewImageToList,
+                              onTap: getImage,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 15),
                                 child: Container(

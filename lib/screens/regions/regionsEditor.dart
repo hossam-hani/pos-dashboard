@@ -1,29 +1,18 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:eckit/models/category.dart';
-import 'package:eckit/services/categories_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:image_picker/image_picker.dart';
 
-import '../../const.dart';
-import '../../validator.dart';
 import '../../models/region.dart';
 import '../../services/regions_service.dart';
+import '../../validator.dart';
 
 @immutable
 class RegionEditorArgumants {
   final Region region;
   final VoidCallback onSaveFinish;
-  const RegionEditorArgumants({
-    this.region,
-    this.onSaveFinish,
-  });
+  const RegionEditorArgumants({this.region, this.onSaveFinish});
 }
 
 class RegionEditor extends StatefulWidget {
@@ -37,8 +26,8 @@ class RegionEditor extends StatefulWidget {
 
 class _RegionEditorState extends State<RegionEditor> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController name = new TextEditingController();
-  TextEditingController fees = new TextEditingController();
+  final name = TextEditingController();
+  final fees = TextEditingController();
   bool _isActive = true;
   bool _isMainRegion = true;
   bool isLoading = false;
@@ -59,10 +48,8 @@ class _RegionEditorState extends State<RegionEditor> {
     ),
   );
 
-  save() async {
-    setState(() {
-      isLoading = true;
-    });
+  Future<void> save() async {
+    setState(() => isLoading = true);
 
     if (_formKey.currentState.validate()) {
       if (!_isMainRegion && currentRegion == null) {
@@ -74,9 +61,7 @@ class _RegionEditorState extends State<RegionEditor> {
                 title: Text('alert'.tr()),
                 content: SingleChildScrollView(
                   child: ListBody(
-                    children: <Widget>[
-                      Text('region_is_empty_alert'.tr()),
-                    ],
+                    children: <Widget>[Text('region_is_empty_alert'.tr())],
                   ),
                 ),
                 actions: <Widget>[
@@ -92,7 +77,6 @@ class _RegionEditorState extends State<RegionEditor> {
       }
 
       try {
-        //TODO: [Issue] product can't be saved
         await RegionsServices.saveRegion(
           name: name.text,
           regionId: _isMainRegion ? null : currentRegion.id.toString(),
@@ -108,9 +92,7 @@ class _RegionEditorState extends State<RegionEditor> {
       }
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    setState(() => isLoading = false);
   }
 
   initValues() async {
@@ -160,40 +142,35 @@ class _RegionEditorState extends State<RegionEditor> {
       bottomNavigationBar: InkWell(
         onTap: save,
         child: Container(
+          height: 80.0,
+          decoration: BoxDecoration(color: const Color(0xff1e272e)),
           child: Center(
             child: isLoading
                 ? loadingKit
                 : Text(
                     "save".tr(),
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: const Color(0xffffffff),
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(fontSize: 20, color: Colors.white),
                     textAlign: TextAlign.left,
                   ),
-          ),
-          height: 80.0,
-          decoration: BoxDecoration(
-            color: const Color(0xff1e272e),
           ),
         ),
       ),
       appBar: AppBar(
-          elevation: 0,
-          toolbarHeight: 100,
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          leading: new IconButton(
-            icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Image.asset(
-            "assets/images/logo.png",
-            height: 40,
-          )),
+        elevation: 0,
+        toolbarHeight: 100,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Image.asset(
+          "assets/images/logo.png",
+          height: 40,
+        ),
+      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Form(
@@ -317,18 +294,19 @@ class CustomeTextField extends StatelessWidget {
       obscureText: obscureTextbool,
       validator: validator,
       controller: controller,
-      decoration: new InputDecoration(
-          hintText: hintTxt,
-          labelText: labelTxt,
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          ),
-          border: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          )),
+      decoration: InputDecoration(
+        hintText: hintTxt,
+        labelText: labelTxt,
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFECDFDF)),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFECDFDF)),
+        ),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFECDFDF)),
+        ),
+      ),
     );
   }
 }

@@ -66,13 +66,11 @@ class RegionsServices {
       dio.options.headers['content-Type'] = 'application/json';
       dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-      Response response = await dio.post(id != null ? "$baseUrl/regions/$id" : "$baseUrl/regions",
-          data: regionId != null
-              ? {"name": name, "is_active": isActive, "fees": fees, "region_id": regionId}
-              : {
-                  "name": name,
-                  "is_active": isActive,
-                },
+      final data = regionId != null
+          ? {"name": name, "is_active": isActive, "fees": fees, "region_id": regionId}
+          : {"name": name, "is_active": isActive};
+      final response = await dio.post(id != null ? "$baseUrl/regions/$id" : "$baseUrl/regions",
+          data: data,
           options: Options(
             followRedirects: false,
             validateStatus: (status) {

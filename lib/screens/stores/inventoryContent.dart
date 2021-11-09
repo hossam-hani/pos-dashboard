@@ -1,22 +1,19 @@
-import 'package:eckit/models/category.dart';
-import 'package:eckit/services/categories_service.dart';
-import 'package:eckit/services/inventory_services.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../components/customeButton.dart';
-import 'package:paging/paging.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:eckit/services/product_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../models/product.dart';
-import '../../const.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:paging/paging.dart';
 
-//TODO: fix: exception [RangeError (index): Invalid value: Valid value range is empty: 0]
+import 'package:eckit/services/inventory_services.dart';
+import 'package:eckit/services/product_service.dart';
 
-// ignore: must_be_immutable
+import '../../components/customeButton.dart';
+import '../../const.dart';
+import '../../models/product.dart';
+
 class InventoryContent extends StatefulWidget {
-  String inventoryId;
+  final String inventoryId;
 
   InventoryContent({this.inventoryId});
 
@@ -29,7 +26,8 @@ class _InventoryContentState extends State<InventoryContent> {
   int currentPage = 1;
   bool isLoading = false;
   List<dynamic> quantities = [];
-  var loadingKit = Center(
+
+  final loadingKit = Center(
     child: Column(
       children: [
         SizedBox(
@@ -80,20 +78,16 @@ class _InventoryContentState extends State<InventoryContent> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          elevation: 0,
-          toolbarHeight: 100,
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          leading: new IconButton(
-            icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Image.asset(
-            "assets/images/logo.png",
-            height: 40,
-          )),
+        elevation: 0,
+        toolbarHeight: 100,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Image.asset("assets/images/logo.png", height: 40),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -126,16 +120,25 @@ class _InventoryContentState extends State<InventoryContent> {
 }
 
 class ListItem extends StatelessWidget {
-  String title;
-  String id;
-  String price;
-  String category;
-  String currency;
-  String image;
-  String quantity;
-  Product product;
+  final String title;
+  final String id;
+  final String price;
+  final String category;
+  final String currency;
+  final String image;
+  final String quantity;
+  final Product product;
 
-  ListItem({this.title, this.id, this.price, this.category, this.currency, this.image, this.product, this.quantity});
+  const ListItem({
+    this.title,
+    this.id,
+    this.price,
+    this.category,
+    this.currency,
+    this.image,
+    this.product,
+    this.quantity,
+  });
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -195,7 +198,7 @@ class ListItem extends StatelessWidget {
               )
             ],
           ),
-          Divider()
+          const Divider(height: 0)
         ],
       ),
     );
@@ -234,12 +237,13 @@ class ProductPlaceholder extends StatelessWidget {
             height: 12,
           ),
           SizedBox(
-              width: 200,
-              child: CustomeButton(
-                title: "add_product",
-                icon: FontAwesomeIcons.plus,
-                handler: () => Navigator.pushNamed(context, '/product_editor'),
-              )),
+            width: 200,
+            child: CustomeButton(
+              title: "add_product",
+              icon: FontAwesomeIcons.plus,
+              handler: () => Navigator.pushNamed(context, '/product_editor'),
+            ),
+          ),
         ],
       ),
     );

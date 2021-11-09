@@ -52,25 +52,25 @@ class OrderServices {
     Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
 
     try {
-      Dio dio = new Dio();
+      final dio = Dio();
       dio.options.headers['content-Type'] = 'application/json';
       dio.options.headers['accept'] = 'application/json';
       dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
+      final data = {
+        "shop_id": currentUser.shop.id.toString(),
+        "items": items,
+        "supplier_id": supplierId,
+      };
       final response = await dio.post(
         "$baseUrl/order",
-        data: {
-          "shop_id": currentUser.shop.id.toString(),
-          "items": items,
-          "supplier_id": supplierId,
-        },
+        data: data,
         options: Options(
           followRedirects: false,
-          validateStatus: (status) {
-            return status < 600;
-          },
+          validateStatus: (status) => status < 500,
         ),
       );
+      print(response.data);
     } catch (e) {
       print(e);
       rethrow;

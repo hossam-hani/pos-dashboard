@@ -1,22 +1,17 @@
-import 'package:eckit/models/category.dart';
-import 'package:eckit/screens/regions/regionsEditor.dart';
-import '../../services/regions_service.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../components/customeButton.dart';
-import 'package:paging/paging.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../const.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:paging/paging.dart';
+
+import 'package:eckit/screens/regions/regionsEditor.dart';
+
+import '../../components/customeButton.dart';
+import '../../const.dart';
 import '../../models/region.dart';
+import '../../services/regions_service.dart';
 
 class RegionsList extends StatefulWidget {
-  dynamic changePageHandler;
-  dynamic changeCurrentIndex;
-
-  RegionsList({this.changePageHandler, this.changeCurrentIndex});
-
   @override
   _RegionsListState createState() => _RegionsListState();
 }
@@ -26,7 +21,7 @@ class _RegionsListState extends State<RegionsList> {
   int currentPage = 1;
   bool isLoading = false;
 
-  var loadingKit = Center(
+  final loadingKit = Center(
     child: Column(
       children: [
         SizedBox(

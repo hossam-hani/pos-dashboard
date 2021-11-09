@@ -81,34 +81,36 @@ class ProductServices {
       dio.options.headers['content-Type'] = 'application/json';
       dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
+      final data = images != null
+          ? {
+              "name": name,
+              "price": price,
+              "cost": cost,
+              "category_id": categoryId,
+              "is_active": isActive,
+              "description": description,
+              "unit_type": unitType,
+              "images": jsonEncode(images),
+              "index": index,
+              "stock_status": stockStatus,
+              "price_after_discount": priceAfterDiscount,
+            }
+          : {
+              "name": name,
+              "price": price,
+              "cost": cost,
+              "category_id": categoryId,
+              "is_active": isActive,
+              "unit_type": unitType,
+              "description": description,
+              "index": index,
+              "stock_status": stockStatus,
+              "price_after_discount": priceAfterDiscount,
+            };
+
       Response response = await dio.post(
         id != null ? "$baseUrl/products/$id" : "$baseUrl/products",
-        data: images != null
-            ? {
-                "name": name,
-                "price": price,
-                "cost": cost,
-                "category_id": categoryId,
-                "is_active": isActive,
-                "description": description,
-                "unit_type": unitType,
-                "images": jsonEncode(images),
-                "index": index,
-                "stock_status": stockStatus,
-                "price_after_discount": priceAfterDiscount,
-              }
-            : {
-                "name": name,
-                "price": price,
-                "cost": cost,
-                "category_id": categoryId,
-                "is_active": isActive,
-                "unit_type": unitType,
-                "description": description,
-                "index": index,
-                "stock_status": stockStatus,
-                "price_after_discount": priceAfterDiscount,
-              },
+        data: data,
         options: Options(
           followRedirects: false,
           validateStatus: (status) {

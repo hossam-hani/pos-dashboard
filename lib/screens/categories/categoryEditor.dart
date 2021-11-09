@@ -1,17 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:eckit/models/category.dart';
-import 'package:eckit/services/categories_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:image_picker/image_picker.dart';
 
-import '../../const.dart';
+import 'package:eckit/models/category.dart';
+import 'package:eckit/services/categories_service.dart';
+import 'package:eckit/utilities/image_picker.dart';
+
 import '../../validator.dart';
 
 @immutable
@@ -42,7 +41,6 @@ class _CategoryEditorState extends State<CategoryEditor> {
   String image;
 
   File _image;
-  final picker = ImagePicker();
 
   var loadingKit = Center(
     child: Column(
@@ -59,7 +57,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
   );
 
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await AppImagePicker().pickImageFile();
 
     setState(() {
       if (pickedFile != null) {
@@ -274,13 +272,19 @@ class _CategoryEditorState extends State<CategoryEditor> {
 }
 
 class CustomeTextField extends StatelessWidget {
-  String hintTxt;
-  String labelTxt;
-  TextEditingController controller;
-  dynamic validator;
-  bool obscureTextbool;
+  final String hintTxt;
+  final String labelTxt;
+  final TextEditingController controller;
+  final dynamic validator;
+  final bool obscureTextbool;
 
-  CustomeTextField({this.hintTxt, this.labelTxt, this.controller, this.validator, this.obscureTextbool = false});
+  CustomeTextField({
+    this.hintTxt,
+    this.labelTxt,
+    this.controller,
+    this.validator,
+    this.obscureTextbool = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -288,18 +292,19 @@ class CustomeTextField extends StatelessWidget {
       obscureText: obscureTextbool,
       validator: validator,
       controller: controller,
-      decoration: new InputDecoration(
-          hintText: hintTxt,
-          labelText: labelTxt,
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          ),
-          border: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          )),
+      decoration: InputDecoration(
+        hintText: hintTxt,
+        labelText: labelTxt,
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFECDFDF)),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFECDFDF)),
+        ),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFECDFDF)),
+        ),
+      ),
     );
   }
 }

@@ -46,9 +46,7 @@ class _StoreEditorState extends State<StoreEditor> {
   );
 
   save() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
     //TODO: [fix] throws error 500 when saving new store
     if (_formKey.currentState.validate()) {

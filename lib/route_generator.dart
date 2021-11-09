@@ -66,13 +66,23 @@ class RouteGenerator {
                   endAt: (args as Map)["endAt"],
                 ));
       case '/inventory_content':
-        return MaterialPageRoute(builder: (_) => InventoryContent(inventoryId: args));
+        return MaterialPageRoute(
+          builder: (_) => InventoryContent(
+            inventoryId: args,
+          ),
+        );
       case '/inventory_transactions':
-        return MaterialPageRoute(builder: (_) => InventoryTransactionsList());
+        return MaterialPageRoute(
+          builder: (_) => InventoryTransactionsList(),
+        );
       case '/inventory_transactions_editor':
-        return MaterialPageRoute(builder: (_) => InventoryTransactionEditor());
+        return MaterialPageRoute(
+          builder: (_) => InventoryTransactionEditor(),
+        );
       case '/supplier_invoice_editor':
-        return MaterialPageRoute(builder: (_) => SupplierInvoiceEditor());
+        return MaterialPageRoute(
+          builder: (_) => SupplierInvoiceEditor(),
+        );
       case '/suppliers_invoices':
         return MaterialPageRoute(
             builder: (_) => SuppliersInvoicesReport(
@@ -231,7 +241,9 @@ class RouteGenerator {
                   userArgs: args,
                 ));
       case '/notifications':
-        return MaterialPageRoute(builder: (_) => NotificationsList());
+        return MaterialPageRoute(
+          builder: (_) => NotificationsList(),
+        );
     }
 
     return null;

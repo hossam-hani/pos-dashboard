@@ -1,29 +1,19 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:eckit/models/category.dart';
-import 'package:eckit/models/product.dart';
-import 'package:eckit/models/stock.dart';
-import 'package:eckit/models/store.dart';
-import 'package:eckit/models/supplier.dart';
-import 'package:eckit/services/categories_service.dart';
-import 'package:eckit/services/product_service.dart';
-import 'package:eckit/services/stocks_service.dart';
-import 'package:eckit/services/stores_service.dart';
-import 'package:eckit/services/suppliers_service.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:eckit/validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:image_picker/image_picker.dart';
 
-import '../../const.dart';
-import '../../validator.dart';
-import '../../models/region.dart';
-import '../../services/regions_service.dart';
+import 'package:eckit/models/product.dart';
+import 'package:eckit/models/stock.dart';
+import 'package:eckit/models/store.dart';
+import 'package:eckit/models/supplier.dart';
+import 'package:eckit/services/product_service.dart';
+import 'package:eckit/services/stocks_service.dart';
+import 'package:eckit/services/stores_service.dart';
+import 'package:eckit/services/suppliers_service.dart';
 
 @immutable
 class StockEditorArgumants {

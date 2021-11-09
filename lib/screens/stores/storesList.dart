@@ -82,22 +82,21 @@ class _StoresListState extends State<StoresList> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          elevation: 0,
-          toolbarHeight: 100,
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Center(
-              child: FaIcon(FontAwesomeIcons.times, color: Colors.black),
-            ),
+        elevation: 0,
+        toolbarHeight: 100,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Center(
+            child: FaIcon(FontAwesomeIcons.times, color: Colors.black),
           ),
-          title: Image.asset(
-            "assets/images/logo.png",
-            height: 40,
-          )),
+        ),
+        title: Image.asset(
+          "assets/images/logo.png",
+          height: 40,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -106,18 +105,14 @@ class _StoresListState extends State<StoresList> {
             Row(
               children: [
                 FaIcon(FontAwesomeIcons.mapMarked),
-                SizedBox(
-                  width: 10,
-                ),
+                SizedBox(width: 10),
                 Text(
                   "stores".tr(),
                   style: TextStyle(fontSize: 20),
                 )
               ],
             ),
-            SizedBox(
-              height: 15,
-            ),
+            SizedBox(height: 15),
             Row(
               children: [
                 Expanded(
@@ -152,7 +147,7 @@ class _StoresListState extends State<StoresList> {
             ),
             stores.isEmpty && !isLoading ? CategoryPlaceholder() : SizedBox(),
             stores.isEmpty && !isLoading
-                ? SizedBox()
+                ? SizedBox.shrink()
                 : Expanded(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -176,29 +171,37 @@ class _StoresListState extends State<StoresList> {
 }
 
 class ListItem extends StatelessWidget {
-  String title;
-  String id;
-  String image;
-  Store store;
+  final String title;
+  final String id;
+  final String image;
+  final Store store;
   final VoidCallback onFinishedSave;
 
-  ListItem({this.title, this.id, this.image, this.store, @required this.onFinishedSave});
+  const ListItem({
+    this.title,
+    this.id,
+    this.image,
+    this.store,
+    @required this.onFinishedSave,
+  });
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, '/store_editor',
-          arguments: StoreEditorArgumants(
-            onSaveFinish: onFinishedSave,
-            store: store,
-          )),
+      onTap: () => Navigator.pushNamed(
+        context,
+        '/store_editor',
+        arguments: StoreEditorArgumants(
+          onSaveFinish: onFinishedSave,
+          store: store,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              SizedBox(
-                width: 25,
-              ),
+              SizedBox(width: 25),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -223,25 +226,26 @@ class ListItem extends StatelessWidget {
               )
             ],
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           Container(
             width: MediaQuery.of(context).size.width - 26,
             child: Row(
               children: [
                 Expanded(
-                    child: CustomeButton(
-                  title: "محتويات المخزن".tr(),
-                  icon: null,
-                  handler: () {
-                    Navigator.pushNamed(context, '/inventory_content', arguments: id);
-                  },
-                )),
+                  child: CustomeButton(
+                    title: "محتويات المخزن".tr(),
+                    icon: null,
+                    handler: () => Navigator.pushNamed(
+                      context,
+                      '/inventory_content',
+                      arguments: id,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          Divider()
+          const Divider(height: 0)
         ],
       ),
     );
@@ -276,16 +280,15 @@ class CategoryPlaceholder extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
+          SizedBox(height: 12),
           SizedBox(
-            height: 12,
+            width: 200,
+            child: CustomeButton(
+              title: "add_region",
+              icon: FontAwesomeIcons.plus,
+              handler: () => Navigator.pushNamed(context, '/region_editor'),
+            ),
           ),
-          SizedBox(
-              width: 200,
-              child: CustomeButton(
-                title: "add_region",
-                icon: FontAwesomeIcons.plus,
-                handler: () => Navigator.pushNamed(context, '/region_editor'),
-              )),
         ],
       ),
     );
