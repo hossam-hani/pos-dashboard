@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eckit/screens/products/productEditor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -47,6 +48,7 @@ class _InventoryContentState extends State<InventoryContent> {
 
   Future<List<Product>> getProductsLocal() async {
     List<Product> temp = await ProductServices.getProducts(currentPage.toString(), null);
+    await initData();
 
     setState(() {
       products = products.isEmpty ? temp : products;
@@ -57,17 +59,14 @@ class _InventoryContentState extends State<InventoryContent> {
     return temp;
   }
 
-  initData() async {
+  Future<void> initData() async {
     List<dynamic> quantitiesTemp = await InventoryServices.getQuantities(inventroyId: widget.inventoryId);
-    setState(() {
-      quantities = quantitiesTemp;
-    });
+    quantities = quantitiesTemp;
   }
 
   @override
   void initState() {
     super.initState();
-    initData();
     setState(() {
       isLoading = true;
     });
@@ -93,7 +92,7 @@ class _InventoryContentState extends State<InventoryContent> {
         children: [
           products.isEmpty && !isLoading ? ProductPlaceholder() : SizedBox(),
           products.isEmpty && !isLoading
-              ? SizedBox()
+              ? const SizedBox.shrink()
               : Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -142,7 +141,10 @@ class ListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, '/product_editor', arguments: product),
+      onTap: () => Navigator.pushNamed(context, '/product_editor',
+          arguments: ProductEditorArgumants(
+            product: product,
+          )),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

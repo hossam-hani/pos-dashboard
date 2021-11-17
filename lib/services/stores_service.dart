@@ -54,13 +54,13 @@ class StoreServices {
 
   static Future<Store> saveStore({
     String name,
-    String id,
+    int id,
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
 
     try {
-      Dio dio = new Dio();
+      final dio = Dio();
       dio.options.headers['content-Type'] = 'application/json';
       dio.options.headers['accept'] = 'application/json';
       dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;

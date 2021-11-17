@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -38,7 +39,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
   TextEditingController description = new TextEditingController();
   bool _isActive = true;
   bool isLoading = false;
-  String image;
+  String imageUrl;
 
   File _image;
 
@@ -109,7 +110,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
         name.text = category.name;
         description.text = category.description;
         _isActive = category.isActive;
-        image = category.image;
+        imageUrl = category.image;
       });
     }
   }
@@ -215,52 +216,51 @@ class _CategoryEditorState extends State<CategoryEditor> {
                 SizedBox(
                   height: 20,
                 ),
-                _image != null || image != null
-                    ? _image != null
-                        ? Image.file(_image)
-                        : Image.network(image)
-                    : InkWell(
-                        onTap: getImage,
-                        child: Container(
-                          width: double.infinity,
-                          height: 150.0,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'select_image_category'.tr(),
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: const Color(0xff474747),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'select_image_des'.tr(),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: const Color(0xff7a7171),
-                                  fontWeight: FontWeight.w300,
-                                ),
-                                textAlign: TextAlign.left,
-                              )
-                            ],
+                if (_image != null || imageUrl != null)
+                  _image != null ? _buildImage(_image) : Image.network(imageUrl)
+                else
+                  InkWell(
+                    onTap: getImage,
+                    child: Container(
+                      width: double.infinity,
+                      height: 150.0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'select_image_category'.tr(),
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: const Color(0xff474747),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            color: const Color(0xffffffff),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0x29bbb8b8),
-                                offset: Offset(0, 3),
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                        ),
+                          Text(
+                            'select_image_des'.tr(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: const Color(0xff7a7171),
+                              fontWeight: FontWeight.w300,
+                            ),
+                            textAlign: TextAlign.left,
+                          )
+                        ],
                       ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        color: const Color(0xffffffff),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0x29bbb8b8),
+                            offset: Offset(0, 3),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 FlatButton(onPressed: getImage, child: Text("change_image".tr()))
               ],
             ),
@@ -268,6 +268,22 @@ class _CategoryEditorState extends State<CategoryEditor> {
         ),
       ),
     );
+  }
+
+  Widget _buildImage(File imageFile) {
+    if (kIsWeb) {
+      return Image.network(
+        imageFile.path,
+        width: 100,
+        height: 100,
+      );
+    } else {
+      return Image.file(
+        File(imageFile.path),
+        width: 100,
+        height: 100,
+      );
+    }
   }
 }
 

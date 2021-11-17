@@ -59,10 +59,10 @@ class _StoresListState extends State<StoresList> {
 
   @override
   void initState() {
-    super.initState();
     setState(() {
       isLoading = true;
     });
+    super.initState();
   }
 
   Future<void> _reloadData() async {

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eckit/utilities/image_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -421,57 +422,72 @@ class ImageSelector extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          imageFile != null || image != null
-              ? imageFile != null
-                  ? Image.file(imageFile)
-                  : Image.network(image)
-              : InkWell(
-                  onTap: () => changeImageHandler(index),
-                  child: Container(
-                    width: double.infinity,
-                    height: 150.0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'select_image_category'.tr(),
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: const Color(0xff474747),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          'select_image_des'.tr(),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: const Color(0xff7a7171),
-                            fontWeight: FontWeight.w300,
-                          ),
-                          textAlign: TextAlign.left,
-                        )
-                      ],
+          if (imageFile != null || image != null)
+            imageFile != null ? _buildImage(imageFile) : Image.network(image)
+          else
+            InkWell(
+              onTap: () => changeImageHandler(index),
+              child: Container(
+                width: double.infinity,
+                height: 150.0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'select_image_category'.tr(),
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: const Color(0xff474747),
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
-                      color: const Color(0xffffffff),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0x29bbb8b8),
-                          offset: Offset(0, 3),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                  ),
+                    Text(
+                      'select_image_des'.tr(),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: const Color(0xff7a7171),
+                        fontWeight: FontWeight.w300,
+                      ),
+                      textAlign: TextAlign.left,
+                    )
+                  ],
                 ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.0),
+                  color: const Color(0xffffffff),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0x29bbb8b8),
+                      offset: Offset(0, 3),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           imageFile != null
               ? SizedBox()
               : FlatButton(onPressed: () => changeImageHandler(index), child: Text("change_image".tr()))
         ],
       ),
     );
+  }
+
+  Widget _buildImage(File imageFile) {
+    if (kIsWeb) {
+      return Image.network(
+        imageFile.path,
+        width: 100,
+        height: 100,
+      );
+    } else {
+      return Image.file(
+        File(imageFile.path),
+        width: 100,
+        height: 100,
+      );
+    }
   }
 }

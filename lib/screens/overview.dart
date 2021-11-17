@@ -34,7 +34,7 @@ class _OrderListState extends State<OverView> {
   List<Order> orders = [];
   int currentPage = 1;
   bool isLoading = false;
-  TextEditingController keyword = new TextEditingController();
+  final keyword = TextEditingController();
   String link;
   bool isPaid;
 
@@ -52,18 +52,17 @@ class _OrderListState extends State<OverView> {
     ),
   );
 
-  Future<List<Order>> getProductsLocal() async {
+  Future<List<Order>> getOrders() async {
     List<Order> temp = await OrderServices.getOrders(
       currentPage.toString(),
       widget.keyword,
       widget.customerID,
       true,
     );
-    setState(() {
-      orders = orders.isEmpty ? temp : orders;
-      currentPage = currentPage + 1;
-      isLoading = false;
-    });
+    orders = orders.isEmpty ? temp : orders;
+    currentPage = currentPage + 1;
+    isLoading = false;
+    // setState(() {});
 
     return temp;
   }
@@ -79,12 +78,12 @@ class _OrderListState extends State<OverView> {
   @override
   void initState() {
     timeago.setLocaleMessages('ar', timeago.ArMessages());
-    getStoreData();
-    super.initState();
+    // getStoreData();
     setState(() {
       keyword.text = widget.keyword;
       isLoading = true;
     });
+    super.initState();
   }
 
   @override
@@ -106,7 +105,8 @@ class _OrderListState extends State<OverView> {
               title: Image.asset(
                 "assets/images/logo.png",
                 height: 40,
-              )),
+              ),
+            ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
@@ -185,71 +185,72 @@ class _OrderListState extends State<OverView> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              link == null
-                  ? Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("loading".tr()),
-                    )
-                  : InkWell(
-                      onTap: () async {
-                        String url = 'https://store.eckit.co/$link';
-                        if (await canLaunch(url)) {
-                          await launch(url);
-                        } else {
-                          throw 'Could not launch $url';
-                        }
-                      },
+              if (link == null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("loading".tr()),
+                )
+              else
+                InkWell(
+                  onTap: () async {
+                    String url = 'https://store.eckit.co/$link';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: double.infinity,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'https://store.eckit.co/$link',
+                              style: TextStyle(
+                                fontFamily: 'Lato',
+                                fontSize: 20,
+                                color: const Color(0xffffffff),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
                               children: [
-                                Text(
-                                  'https://store.eckit.co/$link',
-                                  style: TextStyle(
-                                    fontFamily: 'Lato',
-                                    fontSize: 20,
-                                    color: const Color(0xffffffff),
-                                  ),
-                                  textAlign: TextAlign.center,
+                                FaIcon(
+                                  FontAwesomeIcons.externalLinkAlt,
+                                  color: Colors.white,
                                 ),
                                 SizedBox(
-                                  height: 10,
+                                  width: 10,
                                 ),
-                                Row(
-                                  children: [
-                                    FaIcon(
-                                      FontAwesomeIcons.externalLinkAlt,
-                                      color: Colors.white,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      'go_to_store'.tr(),
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: const Color(0xffffffff),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    )
-                                  ],
+                                Text(
+                                  'go_to_store'.tr(),
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: const Color(0xffffffff),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 )
                               ],
-                            ),
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            color: const Color(0xff1e272e),
-                          ),
+                            )
+                          ],
                         ),
                       ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        color: const Color(0xff1e272e),
+                      ),
                     ),
+                  ),
+                ),
               SizedBox(
                 height: 20,
               ),
@@ -265,15 +266,15 @@ class _OrderListState extends State<OverView> {
                   )
                 ],
               ),
-              orders.isEmpty && !isLoading ? ProductPlaceholder() : SizedBox(),
+              orders.isEmpty && !isLoading ? loadingKit : SizedBox.shrink(),
               orders.isEmpty && !isLoading
-                  ? SizedBox()
+                  ? SizedBox.shrink()
                   : Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                         child: Pagination(
                           progress: loadingKit,
-                          pageBuilder: (currentListSize) => getProductsLocal(),
+                          pageBuilder: (currentListSize) => getOrders(),
                           itemBuilder: (index, Order order) => ListItem(
                             id: order.id.toString(),
                             time: timeago.format((DateTime.parse(order.createdAt)), locale: 'ar'),
@@ -296,49 +297,16 @@ class _OrderListState extends State<OverView> {
   }
 }
 
-class CustomeTextField extends StatelessWidget {
-  String hintTxt;
-  String labelTxt;
-
-  TextEditingController controller;
-  dynamic validator;
-  bool obscureTextbool;
-
-  CustomeTextField({this.hintTxt, this.labelTxt, this.controller, this.validator, this.obscureTextbool = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      obscureText: obscureTextbool,
-      validator: validator,
-      controller: controller,
-      decoration: new InputDecoration(
-          hintText: hintTxt,
-          labelText: labelTxt,
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          ),
-          border: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFECDFDF)),
-          )),
-    );
-  }
-}
-
 class ListItem extends StatelessWidget {
-  String id;
-  String address;
-  String time;
-  String status;
-  String total;
-  String customerName;
-  String customerNumber;
-
-  String currency;
-  List<Items> items;
+  final String id;
+  final String address;
+  final String time;
+  final String status;
+  final String total;
+  final String customerName;
+  final String customerNumber;
+  final String currency;
+  final List<Items> items;
 
   ListItem({
     this.address,
@@ -508,9 +476,7 @@ class ProductPlaceholder extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12),
         ],
       ),
     );

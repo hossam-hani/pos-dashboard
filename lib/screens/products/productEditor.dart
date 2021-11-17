@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -133,37 +134,6 @@ class _ProductEditorState extends State<ProductEditor> {
       isLoading = false;
     });
   }
-
-  //   Future<void> loadAssets() async {
-  //   List<Asset> resultList;
-
-  //   try {
-  //     resultList = await MultiImagePicker.pickImages(
-  //       maxImages: 300,
-  //       enableCamera: true,
-  //       selectedAssets: images,
-  //       cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-  //       materialOptions: MaterialOptions(
-  //         actionBarColor: "#abcdef",
-  //         actionBarTitle: "Example App",
-  //         allViewTitle: "All Photos",
-  //         useDetailsView: false,
-  //         selectCircleStrokeColor: "#000000",
-  //       ),
-  //     );
-  //   } on Exception catch (e) {
-  //     print(e);
-  //   }
-
-  //   // If the widget was removed from the tree while the asynchronous platform
-  //   // message was in flight, we want to discard the reply rather than calling
-  //   // setState to update our non-existent appearance.
-  //   if (!mounted) return;
-
-  //   setState(() {
-  //     images = resultList;
-  //   });
-  // }
 
   initValues() async {
     setState(() {
@@ -470,14 +440,8 @@ class _ProductEditorState extends State<ProductEditor> {
                                             padding: const EdgeInsets.all(8.0),
                                             child: Column(
                                               children: [
-                                                Image.file(
-                                                  e,
-                                                  width: 100,
-                                                  height: 100,
-                                                ),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
+                                                _buildImage(e),
+                                                SizedBox(height: 5),
                                                 InkWell(
                                                   onTap: () {
                                                     setState(() {
@@ -580,6 +544,22 @@ class _ProductEditorState extends State<ProductEditor> {
         ),
       ),
     );
+  }
+
+  Widget _buildImage(File imageFile) {
+    if (kIsWeb) {
+      return Image.network(
+        imageFile.path,
+        width: 100,
+        height: 100,
+      );
+    } else {
+      return Image.file(
+        File(imageFile.path),
+        width: 100,
+        height: 100,
+      );
+    }
   }
 }
 

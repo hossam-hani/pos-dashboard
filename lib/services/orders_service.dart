@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:eckit/models/account.dart';
 import 'package:eckit/models/order.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../const.dart';
 
 class GraphDataForSalesAndCosts {
@@ -114,11 +116,14 @@ class OrderServices {
     try {
       Dio dio = new Dio();
       dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers['accept'] = 'application/json';
       dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
       Response response;
       if (neworder) {
-        response = await dio.get("$baseUrl/neworders/?page=$currentPage");
+        final url = "$baseUrl/neworders/?page=$currentPage";
+        print(url);
+        response = await dio.get(url);
       } else if (keyword == null && customerID == null) {
         response = await dio.get("$baseUrl/orders/?page=$currentPage");
       } else if (keyword != null && customerID == null) {
@@ -132,7 +137,7 @@ class OrderServices {
       response.data["data"].forEach((post) => temp.add(Order.fromJson(post)));
       return temp;
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
     return null;
   }

@@ -48,12 +48,11 @@ class _StoreEditorState extends State<StoreEditor> {
   save() async {
     setState(() => isLoading = true);
 
-    //TODO: [fix] throws error 500 when saving new store
     if (_formKey.currentState.validate()) {
       try {
         await StoreServices.saveStore(
           name: name.text,
-          id: widget.storeArgs?.store?.id.toString(),
+          id: widget.storeArgs?.store?.id,
         );
         Navigator.pop(context);
         widget.storeArgs?.onSaveFinish?.call();
@@ -115,20 +114,21 @@ class _StoreEditorState extends State<StoreEditor> {
         ),
       ),
       appBar: AppBar(
-          elevation: 0,
-          toolbarHeight: 100,
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          leading: new IconButton(
-            icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Image.asset(
-            "assets/images/logo.png",
-            height: 40,
-          )),
+        elevation: 0,
+        toolbarHeight: 100,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Image.asset(
+          "assets/images/logo.png",
+          height: 40,
+        ),
+      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Form(
