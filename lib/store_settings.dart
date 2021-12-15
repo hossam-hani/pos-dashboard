@@ -4,15 +4,15 @@ import 'package:dio/dio.dart';
 import 'package:eckit/components/customeButton.dart';
 import 'package:eckit/models/account.dart';
 import 'package:eckit/services/orders_service.dart';
-import 'package:eckit/utilties/time_formater.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import 'components/date_range_picker.dart';
 import 'const.dart';
 import 'dart:ui' as ui;
 
@@ -217,7 +217,6 @@ class _StoreSettingsState extends State<StoreSettings> {
                 child: CustomeButton(
                   title: "المشتريات",
                   handler: () async {
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
                     Navigator.pushNamed(context, '/suppliers_invoices', arguments: {
                       "startAt": null,
                       "endAt": null,
@@ -260,69 +259,17 @@ class _StoreSettingsState extends State<StoreSettings> {
             handler: () => {Navigator.pushNamed(context, '/edit_shop_details')},
           ),
 
-          Row(
-            children: [
-              Expanded(
-                child: FlatButton(
-                    onPressed: () {
-                      DatePicker.showDatePicker(context,
-                          showTitleActions: true,
-                          minTime: DateTime(2021, 1, 1),
-                          maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                        setState(() {
-                          startFrom = date;
-                        });
-                      }, onConfirm: (date) {
-                        setState(() {
-                          startFrom = date;
-                        });
-                      }, currentTime: startFrom, locale: LocaleType.ar);
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'startFrom'.tr(),
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                        Text(
-                          formateDateWithoutTime(startFrom),
-                          style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                        )
-                      ],
-                    )),
-              ),
-              Expanded(
-                child: FlatButton(
-                    onPressed: () {
-                      DatePicker.showDatePicker(context,
-                          showTitleActions: true,
-                          minTime: DateTime(2021, 1, 1),
-                          maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                        setState(() {
-                          endAt = date;
-                        });
-                      }, onConfirm: (date) {
-                        setState(() {
-                          endAt = date;
-                        });
-                      }, currentTime: endAt, locale: LocaleType.ar);
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'endAt'.tr(),
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                        Text(
-                          formateDateWithoutTime(endAt),
-                          style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                        )
-                      ],
-                    )),
-              ),
-            ],
+          DateRangePicker(
+            from: startFrom,
+            to: endAt,
+            onChanged: (from, to) {
+              if (mounted) {
+                setState(() {
+                  startFrom = from;
+                  endAt = to;
+                });
+              }
+            },
           ),
 
           CustomeButton(

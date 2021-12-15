@@ -1,3 +1,4 @@
+import 'package:eckit/components/date_range_picker.dart';
 import 'package:eckit/models/account.dart';
 import 'package:eckit/models/address.dart';
 import 'package:eckit/models/customer.dart';
@@ -12,27 +13,29 @@ import 'package:eckit/services/suppliers_service.dart';
 import 'package:eckit/services/transactions_service.dart';
 import 'package:eckit/utilties/time_formater.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../components/customeButton.dart';
 import 'package:paging/paging.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../models/product.dart';
 import '../../const.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-import '../../validator.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:intl/intl.dart';
 
 class SuppliersInvoicesReport extends StatefulWidget {
-  String supplierId;
-  String startAt;
-  String endAt;
-  String userId;
+  final String supplierId;
+  final String startAt;
+  final String endAt;
+  final String userId;
 
-  SuppliersInvoicesReport({this.supplierId, this.startAt, this.endAt, this.userId});
+  SuppliersInvoicesReport({
+    this.supplierId,
+    this.startAt,
+    this.endAt,
+    this.userId,
+  });
 
   @override
   _SuppliersInvoicesReportListState createState() => _SuppliersInvoicesReportListState();
@@ -95,7 +98,7 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
   Future<void> getTotalForOrders() async {
     final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
     final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
-    String valTemp = await OrderServices.gerOrdersTotal(
+    String valTemp = await OrderServices.gerOrdersTotalPrice(
       currentPage.toString(),
       customerId: null,
       userId: null,
@@ -176,69 +179,13 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
                   ],
                 ),
                 Divider(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FlatButton(
-                          onPressed: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                              setState(() {
-                                startFrom = date;
-                              });
-                            }, onConfirm: (date) {
-                              setState(() {
-                                startFrom = date;
-                              });
-                            }, currentTime: startFrom, locale: LocaleType.ar);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'startFrom'.tr(),
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              Text(
-                                formateDateWithoutTime(startFrom ?? DateTime.now()),
-                                style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                              )
-                            ],
-                          )),
-                    ),
-                    Expanded(
-                      child: FlatButton(
-                          onPressed: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                              setState(() {
-                                endAt = date;
-                              });
-                            }, onConfirm: (date) {
-                              setState(() {
-                                endAt = date;
-                              });
-                            }, currentTime: endAt, locale: LocaleType.ar);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'endAt'.tr(),
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              Text(
-                                formateDateWithoutTime(endAt ?? DateTime.now()),
-                                style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                              )
-                            ],
-                          )),
-                    ),
-                  ],
+                DateRangePicker(
+                  from: startFrom,
+                  to: endAt,
+                  onChanged: (from, to) {
+                    startFrom = from;
+                    endAt = to;
+                  },
                 ),
                 SizedBox(
                   height: 10,
@@ -275,9 +222,7 @@ class _SuppliersInvoicesReportListState extends State<SuppliersInvoicesReport> {
                   height: 10,
                 ),
                 CustomeButton(
-                  handler: () {
-                    _reloadData();
-                  },
+                  handler: () => _reloadData(),
                   title: "confirm".tr(),
                 ),
                 ListTile(

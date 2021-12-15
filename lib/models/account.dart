@@ -72,7 +72,37 @@ class User {
     data['role'] = this.role;
     return data;
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is User &&
+        other.name == name &&
+        other.email == email &&
+        other.phone == phone &&
+        other.isBlocked == isBlocked &&
+        other.shopId == shopId &&
+        other.updatedAt == updatedAt &&
+        other.createdAt == createdAt &&
+        other.role == role &&
+        other.id == id;
+  }
+
+  @override
+  int get hashCode {
+    return name.hashCode ^
+        email.hashCode ^
+        phone.hashCode ^
+        isBlocked.hashCode ^
+        shopId.hashCode ^
+        updatedAt.hashCode ^
+        createdAt.hashCode ^
+        role.hashCode ^
+        id.hashCode;
+  }
 }
+
 class Shop {
   int id;
   String name;
@@ -99,7 +129,7 @@ class Shop {
   String sliderimage5;
   String gaId;
   String pixelId;
-        
+
   bool isActive;
 
   Shop(

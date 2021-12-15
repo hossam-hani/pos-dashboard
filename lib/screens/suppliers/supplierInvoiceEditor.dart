@@ -16,8 +16,6 @@ import 'package:eckit/services/product_service.dart';
 import 'package:eckit/services/stores_service.dart';
 import 'package:eckit/services/suppliers_service.dart';
 
-//TODO: fix add supplier invoice
-
 // ignore: must_be_immutable
 class SupplierInvoiceEditor extends StatefulWidget {
   SupplierInvoiceEditor();
@@ -67,7 +65,7 @@ class _SupplierInvoiceEditorState extends State<SupplierInvoiceEditor> {
       itemsec.add({
         "id": element["product"].id.toString(),
         "quantity": element["quantity"],
-        "notes": null,
+        "notes": "",
         "inventory_id": element["inventory"].id.toString(),
         "cost": element["cost"].toString(),
       });
@@ -79,7 +77,11 @@ class _SupplierInvoiceEditorState extends State<SupplierInvoiceEditor> {
           items: jsonEncode(itemsec),
           supplierId: currentSupplier.id.toString(),
         );
-        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/suppliers_invoices', arguments: {
+          "startAt": null,
+          "endAt": null,
+          "supplierId": null,
+        });
       } catch (e) {
         /* do nothing */
       }
@@ -195,9 +197,7 @@ class _SupplierInvoiceEditorState extends State<SupplierInvoiceEditor> {
                                 },
                               ),
                             ),
-                      Divider(
-                        color: Colors.black,
-                      ),
+                      Divider(color: Colors.black),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(

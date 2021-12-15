@@ -3,15 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 
+import 'package:easy_logger/easy_logger.dart';
+
 import 'route_generator.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+  EasyLocalization.logger.enableLevels = [LevelMessages.error];
   runApp(
     EasyLocalization(
-        supportedLocales: [Locale('ar', 'AR')],
-        path: 'assets/translations',
-        fallbackLocale: Locale('ar', 'AR'),
-        child: MyApp()),
+      supportedLocales: [Locale('ar', 'AR')],
+      path: 'assets/translations',
+      fallbackLocale: Locale('ar', 'AR'),
+      child: MyApp(),
+    ),
   );
 }
 

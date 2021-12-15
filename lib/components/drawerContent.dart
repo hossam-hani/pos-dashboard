@@ -17,6 +17,7 @@ class _DrawerContentState extends State<DrawerContent> {
         children: [
           InkWell(
             onTap: () {
+              Navigator.pop(context);
               Navigator.pushNamed(context, '/regions');
             },
             child: ListTile(
@@ -43,6 +44,7 @@ class _DrawerContentState extends State<DrawerContent> {
 
           InkWell(
             onTap: () {
+              Navigator.pop(context);
               Navigator.pushNamed(context, '/suppliers');
             },
             child: ListTile(
@@ -55,6 +57,7 @@ class _DrawerContentState extends State<DrawerContent> {
 
           InkWell(
             onTap: () {
+              Navigator.pop(context);
               Navigator.pushNamed(context, '/stores');
             },
             child: ListTile(
@@ -95,6 +98,7 @@ class _DrawerContentState extends State<DrawerContent> {
 
           InkWell(
             onTap: () {
+              Navigator.pop(context);
               Navigator.pushNamed(context, '/users');
             },
             child: ListTile(

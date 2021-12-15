@@ -1,6 +1,3 @@
-
-
-
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -14,61 +11,57 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../const.dart';
 
-class TaxesService{
-
+class TaxesService {
   static Future<Taxes> getTaxes() async {
-      
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
 
-      try {
-        Dio dio = new Dio();
-        dio.options.headers['content-Type'] = 'application/json';
-        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+    try {
+      Dio dio = new Dio();
+      dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-        Response response = await dio.get("$baseUrl/taxes");
+      Response response = await dio.get("$baseUrl/taxes");
 
-        return Taxes.fromJson(response.data);
-      } catch (e) {
-        print(e);
-      }
-      return null;
+      return Taxes.fromJson(response.data);
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 
-      static Future<void> saveTaxes({
-      String tax1Title, String tax1Amount,
-      String tax2Title, String tax2Amount,
-      String tax3Title, String tax3Amount
-      }) async {
-      
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
+  static Future<void> saveTaxes(
+      {String tax1Title,
+      String tax1Amount,
+      String tax2Title,
+      String tax2Amount,
+      String tax3Title,
+      String tax3Amount}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Account currentUser = Account.fromJson(jsonDecode(prefs.getString("account")));
 
-      try {
-        Dio dio = new Dio();
-        dio.options.headers['content-Type'] = 'application/json';
-        dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
+    try {
+      final dio = Dio();
+      dio.options.headers['content-Type'] = 'application/json';
+      dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-        Response response = await dio.post("$baseUrl/taxes/update",data: {
-          "tax1_title" : tax1Title,
-          "tax1_amount" : tax1Amount,
-          "tax2_title" : tax2Title,
-          "tax2_amount" : tax2Amount,
-          "tax3_title" : tax3Title,
-          "tax3_amount" : tax3Amount,
-        });
+      final data = {
+        "tax1_title": tax1Title,
+        "tax1_amount": tax1Amount,
+        "tax2_title": tax2Title,
+        "tax2_amount": tax2Amount,
+        "tax3_title": tax3Title,
+        "tax3_amount": tax3Amount,
+      };
+      final response = await dio.post("$baseUrl/taxes/update", data: data);
 
-        return response.data;
-      } catch (e) {
-        print(e);
-      }
-      return null;
+      return response.data;
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
-
-
-
 }
-
 
 class Taxes {
   String tax1Title;
@@ -78,13 +71,7 @@ class Taxes {
   String tax3Title;
   double tax3Amount;
 
-  Taxes(
-      {this.tax1Title,
-      this.tax1Amount,
-      this.tax2Title,
-      this.tax2Amount,
-      this.tax3Title,
-      this.tax3Amount});
+  Taxes({this.tax1Title, this.tax1Amount, this.tax2Title, this.tax2Amount, this.tax3Title, this.tax3Amount});
 
   Taxes.fromJson(Map<String, dynamic> json) {
     tax1Title = json['tax1_title'];

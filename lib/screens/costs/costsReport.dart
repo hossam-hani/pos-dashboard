@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:eckit/components/date_range_picker.dart';
 import 'package:eckit/models/address.dart';
 import 'package:eckit/models/cost.dart';
 import 'package:eckit/models/customer.dart';
@@ -12,7 +13,7 @@ import 'package:eckit/services/orders_service.dart';
 import 'package:eckit/services/transactions_service.dart';
 import 'package:eckit/utilties/time_formater.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../components/customeButton.dart';
 import 'package:paging/paging.dart';
@@ -175,69 +176,17 @@ class _CustomerListState extends State<CostsReport> {
                   ],
                 ),
                 Divider(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FlatButton(
-                          onPressed: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                              setState(() {
-                                startFrom = date;
-                              });
-                            }, onConfirm: (date) {
-                              setState(() {
-                                startFrom = date;
-                              });
-                            }, currentTime: startFrom, locale: LocaleType.ar);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'startFrom'.tr(),
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              Text(
-                                formateTime(startFrom ?? DateTime.now()),
-                                style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                              )
-                            ],
-                          )),
-                    ),
-                    Expanded(
-                      child: FlatButton(
-                          onPressed: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                              setState(() {
-                                endAt = date;
-                              });
-                            }, onConfirm: (date) {
-                              setState(() {
-                                endAt = date;
-                              });
-                            }, currentTime: endAt, locale: LocaleType.ar);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'endAt'.tr(),
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              Text(
-                                formateTime(endAt ?? DateTime.now()),
-                                style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                              )
-                            ],
-                          )),
-                    ),
-                  ],
+                DateRangePicker(
+                  from: startFrom,
+                  to: endAt,
+                  onChanged: (from, to) {
+                    if (mounted) {
+                      setState(() {
+                        startFrom = from;
+                        endAt = to;
+                      });
+                    }
+                  },
                 ),
                 DropdownButton<String>(
                   isExpanded: true,

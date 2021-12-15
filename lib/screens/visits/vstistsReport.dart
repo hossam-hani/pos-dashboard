@@ -1,3 +1,4 @@
+import 'package:eckit/components/date_range_picker.dart';
 import 'package:eckit/models/account.dart';
 import 'package:eckit/models/address.dart';
 import 'package:eckit/models/customer.dart';
@@ -12,7 +13,7 @@ import 'package:eckit/services/transactions_service.dart';
 import 'package:eckit/services/visits_service.dart';
 import 'package:eckit/utilties/time_formater.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../components/customeButton.dart';
 import 'package:paging/paging.dart';
@@ -101,7 +102,7 @@ class _VstistsListState extends State<VstistsReport> {
     final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
     final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
 
-    final valTemp = await OrderServices.gerOrdersTotal(
+    final valTemp = await OrderServices.gerOrdersTotalPrice(
       currentPage.toString(),
       customerId: widget.customerId,
       userId: user?.id?.toString() ?? widget.userId,
@@ -180,69 +181,17 @@ class _VstistsListState extends State<VstistsReport> {
                   ],
                 ),
                 Divider(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FlatButton(
-                          onPressed: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                              setState(() {
-                                startFrom = date;
-                              });
-                            }, onConfirm: (date) {
-                              setState(() {
-                                startFrom = date;
-                              });
-                            }, currentTime: startFrom, locale: LocaleType.ar);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'startFrom'.tr(),
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              Text(
-                                formateDateWithoutTime(startFrom ?? DateTime.now()),
-                                style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                              )
-                            ],
-                          )),
-                    ),
-                    Expanded(
-                      child: FlatButton(
-                          onPressed: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                              setState(() {
-                                endAt = date;
-                              });
-                            }, onConfirm: (date) {
-                              setState(() {
-                                endAt = date;
-                              });
-                            }, currentTime: endAt, locale: LocaleType.ar);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'endAt'.tr(),
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              Text(
-                                formateDateWithoutTime(endAt ?? DateTime.now()),
-                                style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                              )
-                            ],
-                          )),
-                    ),
-                  ],
+                DateRangePicker(
+                  from: startFrom,
+                  to: endAt,
+                  onChanged: (from, to) {
+                    if (mounted) {
+                      setState(() {
+                        startFrom = from;
+                        endAt = to;
+                      });
+                    }
+                  },
                 ),
                 SizedBox(height: 10),
                 if (users != null)

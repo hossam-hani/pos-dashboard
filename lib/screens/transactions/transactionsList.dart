@@ -1,4 +1,5 @@
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:eckit/components/date_range_picker.dart';
 import 'package:eckit/models/category.dart';
 import 'package:eckit/models/customer.dart';
 import 'package:eckit/models/stock.dart';
@@ -10,7 +11,7 @@ import 'package:eckit/services/suppliers_service.dart';
 import 'package:eckit/services/transactions_service.dart';
 import 'package:eckit/utilties/time_formater.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import '../../services/regions_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -198,69 +199,17 @@ class _TransactionsListState extends State<TransactionsList> {
                 ? Column(
                     children: [
                       Divider(),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: FlatButton(
-                                onPressed: () {
-                                  DatePicker.showDateTimePicker(context,
-                                      showTitleActions: true,
-                                      minTime: DateTime(2021, 1, 1),
-                                      maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                                    setState(() {
-                                      startFrom = date;
-                                    });
-                                  }, onConfirm: (date) {
-                                    setState(() {
-                                      startFrom = date;
-                                    });
-                                  }, currentTime: startFrom, locale: LocaleType.ar);
-                                },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'startFrom'.tr(),
-                                      style: TextStyle(color: Colors.blue),
-                                    ),
-                                    Text(
-                                      formateDateWithoutTime(startFrom),
-                                      style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                                    )
-                                  ],
-                                )),
-                          ),
-                          Expanded(
-                            child: FlatButton(
-                                onPressed: () {
-                                  DatePicker.showDatePicker(context,
-                                      showTitleActions: true,
-                                      minTime: DateTime(2021, 1, 1),
-                                      maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                                    setState(() {
-                                      endAt = date;
-                                    });
-                                  }, onConfirm: (date) {
-                                    setState(() {
-                                      endAt = date;
-                                    });
-                                  }, currentTime: endAt, locale: LocaleType.ar);
-                                },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'endAt'.tr(),
-                                      style: TextStyle(color: Colors.blue),
-                                    ),
-                                    Text(
-                                      formateDateWithoutTime(endAt),
-                                      style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                                    )
-                                  ],
-                                )),
-                          ),
-                        ],
+                      DateRangePicker(
+                        from: startFrom,
+                        to: endAt,
+                        onChanged: (from, to) {
+                          if (mounted) {
+                            setState(() {
+                              startFrom = from;
+                              endAt = to;
+                            });
+                          }
+                        },
                       ),
                       SizedBox(
                         height: 10,

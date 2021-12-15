@@ -160,7 +160,6 @@ class OrderServices {
       dio.options.headers['content-Type'] = 'application/json';
       dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
 
-      Response response;
       String url = "$baseUrl/orders/reports?page=$currentPage";
 
       if (supplierInvoices != null) {
@@ -183,23 +182,27 @@ class OrderServices {
         url = url + "&end_at=$endAt";
       }
 
-      // if(userId != null){
-      //   url = url + "&user_id=$userId";
-      // }
+      if (userId != null) {
+        url = url + "&user_id=$userId";
+      }
 
-      response = await dio.get(url);
+      log(url);
 
-      List<Order> temp = [];
-      print(response.data);
-      response.data["data"].forEach((post) => temp.add(Order.fromJson(post)));
-      return temp;
+      final response = await dio.get(url);
+
+      final List<Order> orders = (response.data["data"] as List)
+          .map(
+            (post) => Order.fromJson(post),
+          )
+          .toList();
+      return orders;
     } catch (e) {
       print(e);
     }
     return null;
   }
 
-  static Future<String> gerOrdersTotal(
+  static Future<String> gerOrdersTotalPrice(
     String currentPage, {
     String startAt,
     String endAt,
@@ -213,11 +216,9 @@ class OrderServices {
     print(jsonDecode(prefs.getString("account")));
 
     try {
-      Dio dio = new Dio();
+      final dio = Dio();
       dio.options.headers['content-Type'] = 'application/json';
       dio.options.headers["authorization"] = "Bearer " + currentUser.accessToken;
-
-      Response response;
       String url = "$baseUrl/orders/reports/total?page=$currentPage";
 
       if (supplierInvoices != null) {
@@ -240,11 +241,15 @@ class OrderServices {
         url = url + "&end_at=$endAt";
       }
 
-      // if(userId != null){
-      //   url = url + "&user_id=$userId";
-      // }
+      if (userId != null) {
+        url = url + "&user_id=$userId";
+      }
 
-      response = await dio.get(url);
+      log(url);
+
+      final response = await dio.get(url);
+
+      print(response);
 
       return response.data;
     } catch (e) {

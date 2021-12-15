@@ -1,8 +1,9 @@
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eckit/components/date_range_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -37,10 +38,11 @@ class OrdersReport extends StatefulWidget {
 }
 
 class _CustomerListState extends State<OrdersReport> {
+  Key _paginatorKey = UniqueKey();
   final keyword = TextEditingController();
   List<Order> orders = [];
   int currentPage = 1;
-  bool isLoading = false;
+  bool isLoading = true;
   String totalBalance = '0';
 
   DateTime startFrom;
@@ -49,32 +51,29 @@ class _CustomerListState extends State<OrdersReport> {
 
   List<User> users;
 
-  final loadingKit = Center(
-    child: Column(
-      children: [
-        SizedBox(
-          height: 20,
-        ),
-        SpinKitSquareCircle(
-          color: mainColor,
-          size: 50.0,
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text("loading".tr())
-      ],
-    ),
-  );
+  @override
+  void initState() {
+    timeago.setLocaleMessages('ar', timeago.ArMessages());
+    getOrdersLocal();
+    getTotalForOrders();
+    super.initState();
+  }
+
+  Future<void> _performFiltering() async {
+    currentPage = 1;
+    _paginatorKey = UniqueKey();
+    if (mounted) setState(() {});
+    await getTotalForOrders();
+  }
 
   Future<List<Order>> getOrdersLocal() async {
-    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
-    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
+    final _startAt = startFrom == null ? widget.startAt : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? widget.endAt : DateFormat('yyyy-MM-dd').format(endAt);
     List<Order> temp = await OrderServices.getOrdersReport(
       currentPage.toString(),
       customerId: widget.customerId,
-      startAt: _startAt ?? widget.startAt,
-      endAt: _endAt ?? widget.endAt,
+      startAt: _startAt,
+      endAt: _endAt,
       userId: user?.id?.toString() ?? widget.userId,
     );
 
@@ -88,13 +87,13 @@ class _CustomerListState extends State<OrdersReport> {
   }
 
   Future<void> getTotalForOrders() async {
-    final _startAt = startFrom == null ? null : DateFormat('yyyy-MM-dd').format(startFrom);
-    final _endAt = endAt == null ? null : DateFormat('yyyy-MM-dd').format(endAt);
-    String valTemp = await OrderServices.gerOrdersTotal(
+    final _startAt = startFrom == null ? widget.startAt : DateFormat('yyyy-MM-dd').format(startFrom);
+    final _endAt = endAt == null ? widget.endAt : DateFormat('yyyy-MM-dd').format(endAt);
+    final valTemp = await OrderServices.gerOrdersTotalPrice(
       currentPage.toString(),
       customerId: widget.customerId,
-      startAt: _startAt ?? widget.startAt,
-      endAt: _endAt ?? widget.endAt,
+      startAt: _startAt,
+      endAt: _endAt,
       userId: user?.id?.toString() ?? widget.userId,
     );
 
@@ -102,52 +101,34 @@ class _CustomerListState extends State<OrdersReport> {
 
     setState(() {
       users = temp;
-      log(users.toString());
       totalBalance = valTemp;
-    });
-  }
-
-  @override
-  void initState() {
-    timeago.setLocaleMessages('ar', timeago.ArMessages());
-    getTotalForOrders();
-
-    setState(() {
-      isLoading = true;
-    });
-    super.initState();
-  }
-
-  Future<void> _reloadData() async {
-    setState(() {
-      orders.clear();
-      currentPage = 1;
-      isLoading = false;
-    });
-    await Future.delayed(Duration(milliseconds: 100));
-    setState(() {
-      isLoading = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     currentPage = 1;
+      //     _paginatorKey = UniqueKey();
+      //     setState(() {});
+      //   },
+      // ),
       appBar: AppBar(
-          elevation: 0,
-          toolbarHeight: 100,
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          leading: new IconButton(
-            icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Image.asset(
-            "assets/images/logo.png",
-            height: 40,
-          )),
+        elevation: 0,
+        toolbarHeight: 100,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: FaIcon(FontAwesomeIcons.arrowRight, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Image.asset(
+          "assets/images/logo.png",
+          height: 40,
+        ),
+      ),
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -160,9 +141,7 @@ class _CustomerListState extends State<OrdersReport> {
                 Row(
                   children: [
                     FaIcon(FontAwesomeIcons.receipt),
-                    SizedBox(
-                      width: 10,
-                    ),
+                    SizedBox(width: 10),
                     Text(
                       "الفواتير".tr(),
                       style: TextStyle(fontSize: 20),
@@ -170,73 +149,15 @@ class _CustomerListState extends State<OrdersReport> {
                   ],
                 ),
                 Divider(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FlatButton(
-                          onPressed: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                              setState(() {
-                                startFrom = date;
-                              });
-                            }, onConfirm: (date) {
-                              setState(() {
-                                startFrom = date;
-                              });
-                            }, currentTime: startFrom, locale: LocaleType.ar);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'startFrom'.tr(),
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              Text(
-                                formateDateWithoutTime(startFrom ?? DateTime.now()),
-                                style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                              )
-                            ],
-                          )),
-                    ),
-                    Expanded(
-                      child: FlatButton(
-                          onPressed: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 1, 1), onChanged: (date) {
-                              setState(() {
-                                endAt = date;
-                              });
-                            }, onConfirm: (date) {
-                              setState(() {
-                                endAt = date;
-                              });
-                            }, currentTime: endAt, locale: LocaleType.ar);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'endAt'.tr(),
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              Text(
-                                formateDateWithoutTime(endAt ?? DateTime.now()),
-                                style: TextStyle(color: Colors.grey, fontFamily: "Lato", fontSize: 12),
-                              )
-                            ],
-                          )),
-                    ),
-                  ],
+                DateRangePicker(
+                  from: startFrom,
+                  to: endAt,
+                  onChanged: (from, to) {
+                    startFrom = from;
+                    endAt = to;
+                  },
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 if (users != null)
                   ListTile(
                     leading: Text("المندوب"),
@@ -266,17 +187,21 @@ class _CustomerListState extends State<OrdersReport> {
                     ),
                   ),
                 SizedBox(height: 10),
-                CustomeButton(handler: _reloadData, title: "confirm".tr()),
+                CustomeButton(
+                  handler: _performFiltering,
+                  title: "confirm".tr(),
+                ),
                 ListTile(
                   title: Text("اجمالي الفواتير : ${totalBalance ?? "0"} EGP "),
                 ),
                 orders.isEmpty && !isLoading ? ProductPlaceholder() : SizedBox(),
                 orders.isEmpty && !isLoading
-                    ? SizedBox()
+                    ? SizedBox.shrink()
                     : Expanded(
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                           child: Pagination(
+                            key: _paginatorKey,
                             progress: loadingKit,
                             pageBuilder: (currentListSize) => getOrdersLocal(),
                             itemBuilder: (index, Order order) => ListItem(
@@ -304,6 +229,17 @@ class _CustomerListState extends State<OrdersReport> {
       ),
     );
   }
+
+  final loadingKit = Center(
+    child: Column(
+      children: [
+        SizedBox(height: 20),
+        SpinKitSquareCircle(color: mainColor, size: 50.0),
+        SizedBox(height: 10),
+        Text("loading".tr())
+      ],
+    ),
+  );
 }
 
 class CustomeTextField extends StatelessWidget {
@@ -551,5 +487,29 @@ class ProductPlaceholder extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+///triggers a callback when reaching the scollable widget bottom.
+///
+extension BottomTrigger on ScrollController {
+  ///Triggers [onTrigger] when scrolable widget reaches the [limitFraction] point
+  ///
+  ///which is the fraction of the screen at which the [onTrigger] is called.
+  ///
+  ///[limitFraction] default to `0.9`.
+  ///
+  void onScroll(VoidCallback onTrigger, {double limitFraction}) {
+    addListener(() {
+      if (!_isBottom(limitFraction ?? 0.9)) return;
+      onTrigger.call();
+    });
+  }
+
+  bool _isBottom(double limitFraction) {
+    if (!hasClients) return false;
+    final maxScroll = position.maxScrollExtent;
+    final currentScroll = offset;
+    return currentScroll >= (maxScroll * limitFraction);
   }
 }
