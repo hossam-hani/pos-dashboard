@@ -1,6 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:developer';
+import 'dart:io' as io show File;
 
+import 'package:cross_file/cross_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' hide Category;
@@ -40,12 +42,12 @@ class ProductEditor extends StatefulWidget {
 
 class _ProductEditorState extends State<ProductEditor> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController name = new TextEditingController();
-  TextEditingController description = new TextEditingController();
-  TextEditingController cost = new TextEditingController();
-  TextEditingController price = new TextEditingController();
-  TextEditingController rank = new TextEditingController();
-  TextEditingController priceAfterDiscount = new TextEditingController();
+  final name = TextEditingController();
+  final description = TextEditingController();
+  final cost = TextEditingController();
+  final price = TextEditingController();
+  final rank = TextEditingController();
+  final priceAfterDiscount = TextEditingController();
 
   bool _isActive = true;
   bool _stockStatus = true;
@@ -53,7 +55,7 @@ class _ProductEditorState extends State<ProductEditor> {
   String image;
   Category currentCategory;
   String currentUnit;
-  List<File> images = [];
+  List<XFile> images = [];
 
   List<Attribute> attrbuites = [
     Attribute(title: "Size", isRequired: true, type: "radio", options: [
@@ -94,14 +96,12 @@ class _ProductEditorState extends State<ProductEditor> {
   }
 
   save() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
     if (_formKey.currentState.validate()) {
       List<String> imgsbase64 = [];
 
-      for (var image in images) {
+      for (final image in images) {
         final imageBytes = await image.readAsBytes();
         String base64Image = base64Encode(imageBytes);
         imgsbase64.add(base64Image);
@@ -546,7 +546,7 @@ class _ProductEditorState extends State<ProductEditor> {
     );
   }
 
-  Widget _buildImage(File imageFile) {
+  Widget _buildImage(XFile imageFile) {
     if (kIsWeb) {
       return Image.network(
         imageFile.path,
@@ -555,7 +555,7 @@ class _ProductEditorState extends State<ProductEditor> {
       );
     } else {
       return Image.file(
-        File(imageFile.path),
+        io.File(imageFile.path),
         width: 100,
         height: 100,
       );

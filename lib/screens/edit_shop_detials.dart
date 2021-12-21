@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' as io show File;
 
+import 'package:cross_file/cross_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eckit/utilities/image_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,35 +22,35 @@ class ShopDetials extends StatefulWidget {
 
 class _ShopDetialsState extends State<ShopDetials> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController whatsappnumber = new TextEditingController();
-  TextEditingController phonenumber = new TextEditingController();
-  TextEditingController fbLink = new TextEditingController();
-  TextEditingController instaLink = new TextEditingController();
-  TextEditingController descriptionLink = new TextEditingController();
-  TextEditingController gaId = new TextEditingController();
-  TextEditingController pixelId = new TextEditingController();
+  final whatsappnumber = TextEditingController();
+  final phonenumber = TextEditingController();
+  final fbLink = TextEditingController();
+  final instaLink = TextEditingController();
+  final descriptionLink = TextEditingController();
+  final gaId = TextEditingController();
+  final pixelId = TextEditingController();
 
   bool _isActive = true;
   bool isLoading = false;
   bool initLoading = true;
 
   String image1;
-  File _image1;
+  XFile _image1;
 
   String image2;
-  File _image2;
+  XFile _image2;
 
   String image3;
-  File _image3;
+  XFile _image3;
 
   String image4;
-  File _image4;
+  XFile _image4;
 
   String image5;
-  File _image5;
+  XFile _image5;
 
   String image6;
-  File _image6;
+  XFile _image6;
 
   var loadingKit = Center(
     child: Column(
@@ -71,17 +72,17 @@ class _ShopDetialsState extends State<ShopDetials> {
     setState(() {
       if (pickedFile != null) {
         if (index == 1) {
-          _image1 = File(pickedFile.path);
+          _image1 = pickedFile;
         } else if (index == 2) {
-          _image2 = File(pickedFile.path);
+          _image2 = pickedFile;
         } else if (index == 3) {
-          _image3 = File(pickedFile.path);
+          _image3 = pickedFile;
         } else if (index == 4) {
-          _image4 = File(pickedFile.path);
+          _image4 = pickedFile;
         } else if (index == 5) {
-          _image5 = File(pickedFile.path);
+          _image5 = pickedFile;
         } else if (index == 6) {
-          _image6 = File(pickedFile.path);
+          _image6 = pickedFile;
         }
       } else {
         print('No image selected.');
@@ -89,8 +90,8 @@ class _ShopDetialsState extends State<ShopDetials> {
     });
   }
 
-  Future<String> convertImageToBase64(File Image) async {
-    List<int> imageBytes = await Image.readAsBytesSync();
+  Future<String> convertImageToBase64(XFile imageFile) async {
+    List<int> imageBytes = await imageFile.readAsBytes();
     return base64Encode(imageBytes);
   }
 
@@ -410,10 +411,15 @@ class CustomeTextField extends StatelessWidget {
 class ImageSelector extends StatelessWidget {
   dynamic changeImageHandler;
   String image;
-  File imageFile;
+  XFile imageFile;
   int index;
 
-  ImageSelector({this.changeImageHandler, this.image, this.imageFile, this.index});
+  ImageSelector({
+    this.changeImageHandler,
+    this.image,
+    this.imageFile,
+    this.index,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -475,7 +481,7 @@ class ImageSelector extends StatelessWidget {
     );
   }
 
-  Widget _buildImage(File imageFile) {
+  Widget _buildImage(XFile imageFile) {
     if (kIsWeb) {
       return Image.network(
         imageFile.path,
@@ -484,7 +490,7 @@ class ImageSelector extends StatelessWidget {
       );
     } else {
       return Image.file(
-        File(imageFile.path),
+        io.File(imageFile.path),
         width: 100,
         height: 100,
       );

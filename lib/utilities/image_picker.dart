@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 import 'dart:typed_data';
 
 import 'package:image_picker/image_picker.dart';
@@ -14,9 +14,9 @@ class AppImagePicker {
     return imageFile?.readAsBytes();
   }
 
-  Future<File> pickImageFile() async {
+  Future<XFile> pickImageFile() async {
     final pickedFile = await ImagePicker().getImage(source: ImageSource.gallery);
     if (pickedFile == null) return null;
-    return File(pickedFile.path);
+    return XFile(pickedFile.path);
   }
 }

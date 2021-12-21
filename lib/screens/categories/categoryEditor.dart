@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' as io show File;
 
+import 'package:cross_file/cross_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' hide Category;
@@ -41,7 +42,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
   bool isLoading = false;
   String imageUrl;
 
-  File _image;
+  XFile _image;
 
   var loadingKit = Center(
     child: Column(
@@ -60,13 +61,14 @@ class _CategoryEditorState extends State<CategoryEditor> {
   Future getImage() async {
     final pickedFile = await AppImagePicker().pickImageFile();
 
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
+    if (mounted)
+      setState(() {
+        if (pickedFile != null) {
+          _image = pickedFile;
+        } else {
+          print('No image selected.');
+        }
+      });
   }
 
   Future<void> save() async {
@@ -117,8 +119,8 @@ class _CategoryEditorState extends State<CategoryEditor> {
 
   @override
   void initState() {
-    super.initState();
     initValues();
+    super.initState();
   }
 
   @override
@@ -270,7 +272,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
     );
   }
 
-  Widget _buildImage(File imageFile) {
+  Widget _buildImage(XFile imageFile) {
     if (kIsWeb) {
       return Image.network(
         imageFile.path,
@@ -279,7 +281,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
       );
     } else {
       return Image.file(
-        File(imageFile.path),
+        io.File(imageFile.path),
         width: 100,
         height: 100,
       );

@@ -14,8 +14,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController email = new TextEditingController(text: 'Abdelbari.h@gmail.com');
-  TextEditingController password = new TextEditingController(text: '35603282');
+  final email = TextEditingController(text: 'Abdelbari.h@gmail.com');
+  final password = TextEditingController(text: '35603282');
   bool isLoading = false;
 
   var loadingKit = Center(

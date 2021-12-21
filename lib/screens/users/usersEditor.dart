@@ -1,27 +1,16 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:eckit/models/account.dart';
-import 'package:eckit/models/category.dart';
 import 'package:eckit/models/store.dart';
-import 'package:eckit/models/supplier.dart';
 import 'package:eckit/services/account_service.dart';
-import 'package:eckit/services/categories_service.dart';
 import 'package:eckit/services/stores_service.dart';
-import 'package:eckit/services/suppliers_service.dart';
 import 'package:eckit/services/taxes_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../const.dart';
 import '../../validator.dart';
-import '../../models/region.dart';
-import '../../services/regions_service.dart';
 
 @immutable
 class UsersEditorArgumants {

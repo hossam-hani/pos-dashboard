@@ -1,22 +1,19 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:paging/paging.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:eckit/models/account.dart';
 import 'package:eckit/models/items.dart';
 import 'package:eckit/models/order.dart';
 import 'package:eckit/services/orders_service.dart';
 import 'package:eckit/services/shop_service.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 import '../components/customeButton.dart';
-import 'package:paging/paging.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../models/product.dart';
 import '../const.dart';
-import 'package:easy_localization/easy_localization.dart';
-
-import '../validator.dart';
-import 'package:timeago/timeago.dart' as timeago;
-
 import 'orders/changeStatus.dart';
 
 class OverView extends StatefulWidget {
